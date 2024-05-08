@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\MainController;
+use App\Http\Controllers\StatusController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('app');
-})->name('main');
+Route::get('/', [MainController::class,'index'])->name('main');
+
+Route::get('/users',[UserController::class,'index'])->name('users');
+Route::post('/users',[UserController::class,'store'])->name('users.store');
+
+Route::get('/status',[StatusController::class,'index'])->name('status');

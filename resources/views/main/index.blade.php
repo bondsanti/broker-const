@@ -1,0 +1,23 @@
+@extends('app')
+@section('title', 'แดชบอร์ด')
+@section('content')
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">แดชบอร์ด
+
+                </h1>
+
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+
+
+@endsection
+@push('script')
+
+@endpush
