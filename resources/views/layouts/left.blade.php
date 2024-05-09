@@ -46,8 +46,8 @@
                         </p>
                     </a>
                 </li>
-                  <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }}">
-                      <a href="#" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }}">
+                  <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }} {{ request()->routeIs('notify') ? 'menu-open' : '' }}">
+                      <a href="#" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }} {{ request()->routeIs('notify') ? 'active' : '' }}">
                           <i class="nav-icon fas fa-cogs"></i>
                           <p>
                               ตั้งค่า
@@ -57,12 +57,7 @@
                       <ul class="nav nav-treeview">
 
 
-                          <li class="nav-item">
-                              <a href="" class="nav-link">
-                                  <i class="fa fa-bars nav-icon"></i>
-                                  <p>สถานะ</p>
-                              </a>
-                          </li>
+
                           <li class="nav-item">
                               <a href="{{route('users')}}" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }}">
                                   <i class="fa fa-user nav-icon"></i>
@@ -70,7 +65,7 @@
                               </a>
                           </li>
                           <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="{{route('notify')}}" class="nav-link {{ request()->routeIs('notify') ? 'active' : '' }}">
                                 <i class="fa fa-envelope-circle-check nav-icon"></i>
                                 <p>แจ้งเตือน</p>
                             </a>
