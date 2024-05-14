@@ -121,7 +121,7 @@ class UserController extends Controller
         $roleUser->role_type = $request->role_type_edit;
         $roleUser->save();
 
-        return response()->json(['message' => 'เพิ่มผู้ใช้งานเรียบร้อยแล้ว'], 201);
+        return response()->json(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว'], 201);
     }
 
 

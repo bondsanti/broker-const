@@ -38,4 +38,6 @@ Route::prefix('/notify')->group(function () {
     Route::get('/email/{id}', [NotifyController::class, 'editEmail'])->name('notify.editEmail');
     Route::post('/email/update', [NotifyController::class, 'updateEmail'])->name('notify.updateEmail');
     Route::delete('/email/{id}', [NotifyController::class, 'destroyEmail'])->name('notify.destroyEmail');
+    Route::post('/email/update-status', [NotifyController::class, 'updateStatusEmail'])->name('notify.updateStatusEmail');
+
 });
