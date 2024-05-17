@@ -38,7 +38,7 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                    <a href="" class="nav-link">
+                    <a href="{{route('customers')}}" class="nav-link {{ request()->routeIs('customers') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-people-roof"></i>
                         <p>
                             ข้อมูลลูกค้า

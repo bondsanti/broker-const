@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\NotifyController;
 use App\Http\Controllers\UserController;
@@ -27,7 +28,6 @@ Route::prefix('/users')->group(function () {
 });
 
 Route::prefix('/notify')->group(function () {
-
     Route::get('/',[NotifyController::class,'index'])->name('notify');
     Route::post('/',[NotifyController::class,'store'])->name('notify.store');
     Route::get('/{id}', [NotifyController::class, 'edit'])->name('notify.edit');
@@ -40,4 +40,12 @@ Route::prefix('/notify')->group(function () {
     Route::delete('/email/{id}', [NotifyController::class, 'destroyEmail'])->name('notify.destroyEmail');
     Route::post('/email/update-status', [NotifyController::class, 'updateStatusEmail'])->name('notify.updateStatusEmail');
 
+});
+
+Route::prefix('/customers')->group(function(){
+    Route::get('/', [CustomerController::class, 'index'])->name('customers');
+    Route::post('/', [CustomerController::class, 'store'])->name('customers.store');
+    Route::get('/{id}', [CustomerController::class, 'edit'])->name('customers.edit');
+    Route::post('/update', [CustomerController::class, 'update'])->name('customers.update');
+    Route::delete('/{id}', [CustomerController::class, 'destroy'])->name('customers.destroy');
 });
