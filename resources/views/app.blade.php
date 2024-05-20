@@ -100,6 +100,8 @@
 <script src="{{ asset('vendors/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
 <!-- Bootstrap Switch -->
 <script src="{{ asset('vendors/plugins/bootstrap-switch/js/bootstrap-switch.min.js') }}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{ asset('vendors/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
 
 <script src="{{ asset('vendors/plugins/moment/moment.min.js') }}"></script>
 <script src="{{ asset('vendors/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
