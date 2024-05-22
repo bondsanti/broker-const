@@ -11,8 +11,5 @@ class Department extends Model
     protected $connection = 'mysql_user';
     protected $table = 'tb_department';
 
-    public function logPrinters()
-    {
-        return $this->hasMany(LogPrinter::class);
-    }
+
 }

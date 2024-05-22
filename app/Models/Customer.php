@@ -12,4 +12,9 @@ class Customer extends Model
     protected $connection = 'mysql';
     protected $table = 'customers';
 
+    public function notify_ref()
+    {
+        return $this->belongsTo(Notify::class, 'notify_id', 'id');
+    }
+
 }

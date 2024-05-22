@@ -9,6 +9,7 @@ use App\Models\Notify;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class CustomerController extends Controller
 {
@@ -16,7 +17,8 @@ class CustomerController extends Controller
     {
 
         $Notify = Notify::orderBy('name', 'asc')->get();
-        $Customers = Customer::orderBy('id', 'desc')->get();
+        $Customers = Customer::with('notify_ref:id,name,sla')->whereNull('deleted_at')->orderBy('id', 'desc')->get();
+        //dd($Customers);
         return view('customers.index', compact('Notify', 'Customers'));
     }
 
@@ -80,7 +82,7 @@ class CustomerController extends Controller
             ]);
         }
 
-          //รูปภาพ
+        //ไฟล์
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
                 $filename2 = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
@@ -150,14 +152,62 @@ class CustomerController extends Controller
 
     public function destroy($id)
     {
-        $roleUser = Role_user::where('id', $id)->first();
-        $roleUser_old = $roleUser->toArray();
+        //$roleUser = Role_user::where('id', Session::get('loginId'))->first();
 
-        // Log::addLog($user_id,json_encode($roleUser_old), 'Delete RoleUser : '.$roleUser);
-        $roleUser->delete($id);
+        //Admin ระบบข้อมูล จริง
+        // if ($roleUser->role_type=='SuperAdmin') {
 
-        return response()->json([
-            'message' => 'ลบข้อมูลสำเร็จ'
-        ], 201);
+        $Customers = Customer::where('id', $id)->first();
+        $Customers_old = $Customers->toArray();
+
+        $Files = File::where('cus_no', $Customers->cus_no)->first();
+
+            if ($Files) {
+                // ลบไฟล์จาก storage
+                $filePath = 'public/files/' . $Files->filename;
+                if (Storage::exists($filePath)) {
+                    Storage::delete($filePath);
+                }
+
+                // ลบข้อมูลไฟล์จากฐานข้อมูล
+                $Files->delete();
+            }
+        $Images = Image::where('cus_no', $Customers->cus_no)->first();
+            if ($Images) {
+                // ลบไฟล์จาก storage
+                $filePath = 'public/images/' . $Images->filename;
+                if (Storage::exists($filePath)) {
+                    Storage::delete($filePath);
+                }
+
+                // ลบข้อมูลไฟล์จากฐานข้อมูล
+                $Images->delete();
+            }
+
+
+            // Log::addLog($user_id,json_encode($roleUser_old), 'Delete RoleUser : '.$roleUser);
+            $Customers->delete($id);
+
+            return response()->json([
+                'message' => 'ลบข้อมูลสำเร็จ'
+            ], 201);
+
+        // }else{
+
+        // SoftDelate
+        // $Customers = Customer::where('id', $id)->first();
+        // $Customers_old = $Customers->toArray();
+
+        // $Customers->cus_no = null;
+        // $Customers->deleted_at = Carbon::now();
+        // $Customers->save();
+
+        // return response()->json([
+        //     'message' => 'ลบข้อมูลสำเร็จ'
+        // ], 201);
+
+        // }
+
+
     }
 }
