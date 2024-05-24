@@ -415,7 +415,7 @@
                 //console.log(id);
                 $('#modal-edit').modal('show');
                 $.get('users/' + id, function(data) {
-                    console.log(data);
+                    //console.log(data);
                     $('#id_edit').val(data.id);
                     $('#code_edit').val(data.user_ref.code);
 

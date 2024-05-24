@@ -11,6 +11,6 @@ class Image extends Model
     protected $connection = 'mysql';
     protected $table = 'images';
     protected $fillable = [
-        'id', 'cus_no','url',
+        'id', 'cus_id','url',
     ];
 }

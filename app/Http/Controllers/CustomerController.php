@@ -69,17 +69,23 @@ class CustomerController extends Controller
         $Customers->detail = $request->detail;
         $Customers->remark = $request->remark;
         $Customers->save();
+        $Customers->refresh();
 
+        //dd($Customers->id);
         //รูปภาพ
+        if ($request->hasFile('images')) {
         foreach ($request->file('images') as $image) {
             $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             // Save the image to storage
             // $image->storeAs('public/images', $filename);
             Storage::putFileAs('public/images', $image, $filename);
             Image::create([
-                'cus_no' => $nextCusNo,
+                'cus_id' => $Customers->id,
                 'url' => $filename,
             ]);
+        }
+        } else {
+            // กรณีไม่มีไฟล์ที่อัปโหลด
         }
 
         //ไฟล์
@@ -89,7 +95,7 @@ class CustomerController extends Controller
 
                 Storage::putFileAs('public/files', $file, $filename2);
                 File::create([
-                    'cus_no' => $nextCusNo,
+                    'cus_id' => $Customers->id,
                     'url' => $filename2,
                 ]);
             }
@@ -102,11 +108,10 @@ class CustomerController extends Controller
         return response()->json(['message' => 'เพิ่มข้อมูลเรียบร้อยแล้ว'], 201);
     }
 
-
     public function edit($id)
     {
-        $users = Role_user::with('user_ref:id,code,name_th,name_eng,position_id,active', 'user_ref.position_ref:id,name')->findOrFail($id);
-        return response()->json($users, 200);
+        $Customers = Customer::with('notify_ref:id,name,sla','img_ref:id,cus_id,url','file_ref:id,cus_id,url')->whereNull('deleted_at')->findOrFail($id);
+        return response()->json($Customers, 200);
     }
 
 
@@ -160,7 +165,7 @@ class CustomerController extends Controller
         $Customers = Customer::where('id', $id)->first();
         $Customers_old = $Customers->toArray();
 
-        $Files = File::where('cus_no', $Customers->cus_no)->first();
+        $Files = File::where('cus_id', $Customers->id)->first();
 
             if ($Files) {
                 // ลบไฟล์จาก storage
@@ -172,7 +177,7 @@ class CustomerController extends Controller
                 // ลบข้อมูลไฟล์จากฐานข้อมูล
                 $Files->delete();
             }
-        $Images = Image::where('cus_no', $Customers->cus_no)->first();
+        $Images = Image::where('cus_id', $Customers->id)->first();
             if ($Images) {
                 // ลบไฟล์จาก storage
                 $filePath = 'public/images/' . $Images->filename;
@@ -190,7 +195,7 @@ class CustomerController extends Controller
 
             return response()->json([
                 'message' => 'ลบข้อมูลสำเร็จ'
-            ], 201);
+            ], 200);
 
         // }else{
 
@@ -204,10 +209,39 @@ class CustomerController extends Controller
 
         // return response()->json([
         //     'message' => 'ลบข้อมูลสำเร็จ'
-        // ], 201);
+        // ], 200);
 
         // }
 
 
+    }
+
+
+    public function delImg($id)
+    {
+        try {
+            $image = Image::findOrFail($id);
+
+            Storage::delete('public/images/' . $image->url);
+
+            $image->delete();
+            return response()->json(['success' => 'ลบรูปสำเร็จ'],200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error ไม่สามารถลบรูปได้'], 500);
+        }
+    }
+
+    public function delFile($id)
+    {
+        try {
+            $file = File::findOrFail($id);
+
+            Storage::delete('public/files/' . $file->url);
+
+            $file->delete();
+            return response()->json(['success' => 'ลบไฟล์สำเร็จ'],200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error ไม่สามารถลบไฟล์ได้'], 500);
+        }
     }
 }

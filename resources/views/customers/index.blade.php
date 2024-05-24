@@ -1,8 +1,31 @@
 @extends('app')
 @section('title', 'ข้อมูลลูกค้า')
 @section('content')
-
-
+@push('style')
+<style>
+    .img-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    .btn-tool {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: red;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        padding: 5px;
+    }
+    .btn-tool:hover {
+        color: darkred;
+    }
+    .img-fluid {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+@endpush
 
     <div class="content-header">
         <div class="container-fluid">
@@ -140,7 +163,7 @@
                         <div class="card-body table-responsive">
                             <table id="table" class="table table-hover table-striped text-nowrap">
                                 <thead>
-                                    <tr>
+                                    <tr class="text-center">
                                         <th>#</th>
                                         <th>รหัสลูกค้า</th>
                                         <th>วันที่ ลูกค้าเข้า</th>
@@ -149,12 +172,13 @@
                                         <th>สถานะ</th>
                                         <th>ลักษณะงาน</th>
                                         <th>สถานที่</th>
+                                        <th>งบประมาณ</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($Customers as $Customer)
-                                        <tr>
+                                        <tr class="text-center">
                                             <td width="5%">{{ $loop->index + 1 }}</td>
                                             <td>{{ $Customer->cus_no }}</td>
                                             <td></td>
@@ -163,11 +187,23 @@
                                             <td>{{ $Customer->status }}</td>
                                             <td>{{ optional($Customer->notify_ref)->name }}</td>
                                             <td>{{ $Customer->location }}</td>
+                                            <td>{{ number_format($Customer->budget) }}</td>
                                             <td width="15%" class="text-center">
+                                                <button class="btn bg-gradient-primary btn-sm" title="รายละเอียด">
+                                                    <i class="fa fa-circle-info">
+                                                    </i>
+
+                                                </button>
+                                                <a href="{{ $Customer->maps }}" target="_blank"
+                                                    class="btn bg-gradient-success btn-sm" title="โลเคชั่น">
+                                                    <i class="fa fa-location-dot">
+                                                    </i>
+
+                                                </a>
 
                                                 <button class="btn bg-gradient-info btn-sm edit-item"
                                                     data-id="{{ $Customer->id }}" title="แก้ไข">
-                                                    <i class="fa fa-pencil-square">
+                                                    <i class="fa fa-pen-to-square">
                                                     </i>
 
                                                 </button>
@@ -179,7 +215,7 @@
 
                                             </td>
                                         </tr>
-                                    {{-- @empty
+                                        {{-- @empty
                                         <tr class="text-center">
                                             <td colspan="9" class="text-center">ไม่พบข้อมูล</td>
                                         </tr>
@@ -192,7 +228,7 @@
                 </div>
             </div>
 
-            <!-- modal เพิ่มข้อมูลพนักงาน-->
+            <!-- modal เพิ่มข้อมูล-->
             <div class="modal fade" id="modal-create">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
@@ -337,7 +373,305 @@
                 </div>
                 <!-- /.modal-dialog -->
             </div>
-            <!-- /.modal -->
+
+            <!-- modal แก้ไขข้อมูล-->
+            <div class="modal fade" id="modal-edit">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <font color="red">แก้ไขข้อมูล</font> ลูกค้า
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="editForm" name="editForm" class="form-horizontal" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="id_edit" id="id_edit">
+                            <div class="modal-body">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">ชื่อ-สกุล</label>
+                                                <input type="text" class="col-md-12 form-control" id="cus_name_edit"
+                                                    name="cus_name_edit" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 cus_name_edit_err"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">เบอร์โทรศัพท์</label>
+                                                <input type="text" class="col-md-12 form-control" id="tel_edit"
+                                                    name="tel_edit" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 tel_edit_err"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">เลือกลักษณะงาน</label>
+                                                <select class="col-md-12 form-control" name="notify_id_edit"
+                                                    id="notify_id_edit">
+                                                    <option value="">เลือก</option>
+                                                    @foreach ($Notify as $Notifys)
+                                                        <option value="{{ $Notifys->id }}">{{ $Notifys->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <p class="text-danger mt-1 notify_edit_err"></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">งบประมาณ</label>
+                                                <input type="text" class="col-md-12 form-control" id="budget_edit"
+                                                    name="budget_edit" placeholder="" autocomplete="off"
+                                                    onkeyup="this.value = Commas(this.value)">
+                                                <p class="text-danger mt-1 budget_edit_err"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">สถานที่</label>
+                                                <input type="text" class="col-md-12 form-control" id="location_edit"
+                                                    name="location_edit" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 location_edit_err"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">ลิงค์ Location</label>
+                                                <input type="text" class="col-md-12 form-control" id="maps_edit"
+                                                    name="maps_edit" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 maps_edit_err"></p>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="inputEmail3" class="col-form-label">รูปภาพ</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="images"
+                                                            name="images" accept=".jpg, .jpeg, .png" multiple>
+                                                        <label class="custom-file-label" for="images">Choose
+                                                            JPG, PNG</label>
+                                                    </div>
+
+                                                </div>
+
+                                                <p class="text-danger mt-1">สามารถเลือกได้หลายรูป</p>
+                                                <div class="row" id="image-container">
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="inputEmail3" class="col-form-label">เอกสารแนบ</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="files"
+                                                            name="files" accept=".pdf" multiple>
+                                                        <label class="custom-file-label" for="exampleInputFile">Choose
+                                                            PDF</label>
+                                                    </div>
+
+                                                </div>
+                                                <p class="text-danger mt-1">สามารถเลือกได้หลายไฟล์</p>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="inputEmail3" class="col-form-label">วันที่ลูกค้าเข้า</label>
+
+                                                <input type="text" class="col-md-12 form-control datepicker"
+                                                    id="cus_date_edit" name="cus_date_edit" placeholder=""
+                                                    autocomplete="off">
+                                                <p class="text-danger mt-1 cus_date_edit_err"></p>
+
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="inputEmail3" class="col-form-label">วันที่นัดเข้างาน</label>
+                                                <input type="text" class="col-md-12 form-control datepicker"
+                                                    id="onsite_date_edit" name="onsite_date_edit" placeholder=""
+                                                    autocomplete="off">
+                                                <p class="text-danger mt-1 onsite_date_edit_err"></p>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="inputEmail3" class="col-form-label">รายละเอียด</label>
+                                                <textarea id="detail_edit" name="detail_edit" class="col-md-12 form-control">
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="inputEmail3" class="col-form-label">หมายเหตุ</label>
+                                                <input type="text" class="col-md-12 form-control" id="remark_edit"
+                                                    name="remark_edit" placeholder="" autocomplete="off">
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn bg-gradient-danger" data-dismiss="modal"><i
+                                        class="fa fa-times"></i> ยกเลิก</button>
+                                <button type="button" class="btn bg-gradient-success" id="savedata" value="create"><i
+                                        class="fa fa-save"></i> บันทึก</button>
+                            </div>
+
+                        </form>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+
+            <!-- modal info -->
+            <div class="modal fade" id="modal-info">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">เพิ่มข้อมูล ลูกค้า</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm" name="createForm" class="form-horizontal" enctype="multipart/form-data">
+                            @csrf
+
+                            <div class="modal-body">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">ชื่อ-สกุล</label>
+                                                <input type="text" class="col-md-12 form-control" id="cus_name"
+                                                    name="cus_name" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 cus_name_err"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">เบอร์โทรศัพท์</label>
+                                                <input type="text" class="col-md-12 form-control" id="tel"
+                                                    name="tel" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 tel_err"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">เลือกลักษณะงาน</label>
+                                                <select class="col-md-12 form-control" name="notify_id" id="notify_id">
+                                                    <option value="">เลือก</option>
+                                                    @foreach ($Notify as $Notifys)
+                                                        <option value="{{ $Notifys->id }}">{{ $Notifys->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <p class="text-danger mt-1 notify_err"></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">งบประมาณ</label>
+                                                <input type="text" class="col-md-12 form-control" id="budget"
+                                                    name="budget" placeholder="" autocomplete="off"
+                                                    onkeyup="this.value = Commas(this.value)">
+                                                <p class="text-danger mt-1 budget_err"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">สถานที่</label>
+                                                <input type="text" class="col-md-12 form-control" id="location"
+                                                    name="location" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 location_err"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="inputEmail3" class="col-form-label">ลิงค์ Location</label>
+                                                <input type="text" class="col-md-12 form-control" id="maps"
+                                                    name="maps" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 maps_err"></p>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="inputEmail3" class="col-form-label">รูปภาพ</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="images"
+                                                            name="images" accept=".jpg, .jpeg, .png" multiple>
+                                                        <label class="custom-file-label" for="images">Choose
+                                                            JPG, PNG</label>
+                                                    </div>
+
+                                                </div>
+
+                                                <p class="text-danger mt-1">สามารถเลือกได้หลายรูป</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="inputEmail3" class="col-form-label">เอกสารแนบ</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="files"
+                                                            name="files" accept=".pdf" multiple>
+                                                        <label class="custom-file-label" for="exampleInputFile">Choose
+                                                            PDF</label>
+                                                    </div>
+
+                                                </div>
+                                                <p class="text-danger mt-1">สามารถเลือกได้หลายไฟล์</p>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="inputEmail3" class="col-form-label">วันที่ลูกค้าเข้า</label>
+
+                                                <input type="text" class="col-md-12 form-control datepicker"
+                                                    id="cus_date" name="cus_date" placeholder="" autocomplete="off">
+                                                <p class="text-danger mt-1 cus_date_err"></p>
+
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="inputEmail3" class="col-form-label">วันที่นัดเข้างาน</label>
+                                                <input type="text" class="col-md-12 form-control datepicker"
+                                                    id="onsite_date" name="onsite_date" placeholder=""
+                                                    autocomplete="off">
+                                                <p class="text-danger mt-1 onsite_date_err"></p>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="inputEmail3" class="col-form-label">รายละเอียด</label>
+                                                <textarea id="summernote" name="detail" class="col-md-12 form-control">
+                                                              </textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="inputEmail3" class="col-form-label">หมายเหตุ</label>
+                                                <input type="text" class="col-md-12 form-control" id="remark"
+                                                    name="remark" placeholder="" autocomplete="off">
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn bg-gradient-danger" data-dismiss="modal"><i
+                                        class="fa fa-times"></i> ยกเลิก</button>
+                                <button type="button" class="btn bg-gradient-success" id="savedata" value="create"><i
+                                        class="fa fa-save"></i> บันทึก</button>
+                            </div>
+
+                        </form>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
 
 
 
@@ -386,7 +720,7 @@
                 'paging': true,
                 'lengthChange': true,
                 'searching': true,
-                'ordering': false,
+                'ordering': true,
                 'info': false,
                 'autoWidth': false,
                 "responsive": true
@@ -484,6 +818,69 @@
                         }
                     }
                 });
+            });
+
+
+            //Edit
+            $('body').on('click', '.edit-item', function() {
+
+                const id = $(this).data('id');
+                //console.log(id);
+                $('#modal-edit').modal('show');
+                $.get('customers/' + id, function(data) {
+                    console.log(data.img_ref);
+                    $('#id_edit').val(data.id);
+                    $('#cus_name_edit').val(data.cus_name);
+                    $('#tel_edit').val(data.tel);
+                    $('#budget_edit').val(Commas(data.budget));
+                    $('#maps_edit').val(data.maps);
+                    $('#cus_date_edit').val(data.cus_date);
+                    $('#onsite_date_edit').val(data.onsite_date);
+                    $('#location_edit').val(data.location);
+                    $('#detail_edit').summernote('code', data.detail);
+                    $('#remark_edit').val(data.remark);
+
+                    // $('#imgshow-1').attr('src', data.img_ref.url);
+
+                    var imgRefs = data.img_ref;
+                    var container = $('#image-container');
+                    container.empty();
+
+                    imgRefs.forEach((img, index) => {
+                        var imgWrapper = $('<div>', {
+                            class: 'col-md-3',
+                            id: `img-wrapper-${index + 1}`
+                        });
+                        var imgElement = $('<img>', {
+                            class: 'img-fluid mb-1',
+                            id: `imgshow-${index + 1}`,
+                            // src: 'images/'+img.url,
+                            src:`{{ asset('storage/images') }}/${img.url}`,
+                            name: `imgshow-${index + 1}`
+                        });
+                        var deleteButton = $('<a>', {
+                            href: '#',
+                            class: 'float-right btn-tool',
+                            html: '<i class="fas fa-times"></i>',
+                            click: function(event) {
+                                event.preventDefault();
+                                $(`#img-wrapper-${index + 1}`).remove();
+                            }
+                        });
+
+                        imgWrapper.append(imgElement).append(deleteButton);
+                        container.append(imgWrapper);
+                    });
+
+                    if (data.notify_id == null || data.notify_id === "") {
+                        $('#notify_id_edit option[value=""]').prop('selected', true);
+                    } else {
+                        $('#notify_id_edit option[value="' + data.notify_id + '"]').prop('selected',
+                            true);
+                    }
+                });
+
+
             });
 
 

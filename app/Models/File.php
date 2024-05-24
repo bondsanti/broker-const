@@ -12,6 +12,6 @@ class File extends Model
     protected $table = 'files';
 
     protected $fillable = [
-        'id', 'cus_no','url',
+        'id', 'cus_id','url',
     ];
 }

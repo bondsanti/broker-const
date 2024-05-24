@@ -17,4 +17,14 @@ class Customer extends Model
         return $this->belongsTo(Notify::class, 'notify_id', 'id');
     }
 
+    public function img_ref()
+    {
+        return $this->hasMany(Image::class, 'cus_id', 'id');
+    }
+
+    public function file_ref()
+    {
+        return $this->hasMany(File::class, 'cus_id', 'id');
+    }
+
 }

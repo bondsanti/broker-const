@@ -48,4 +48,6 @@ Route::prefix('/customers')->group(function(){
     Route::get('/{id}', [CustomerController::class, 'edit'])->name('customers.edit');
     Route::post('/update', [CustomerController::class, 'update'])->name('customers.update');
     Route::delete('/{id}', [CustomerController::class, 'destroy'])->name('customers.destroy');
+    Route::delete('delete-image/{id}', [CustomerController::class, 'deleteImg'])->name('customers.delImg');
+    Route::delete('delete-file/{id}', [CustomerController::class, 'deleteFile'])->name('customers.delFile');
 });
