@@ -37,6 +37,9 @@
         <link rel="stylesheet" href="{{ asset('vendors/plugins/summernote/summernote-bs4.min.css') }}">
         <link rel="stylesheet" href="{{ asset('vendors/plugins/select2/css/select2.min.css') }}">
 
+          <!-- Toastr -->
+        <link rel="stylesheet" href="{{ asset('vendors/plugins/toastr/toastr.min.css') }}">
+
         <link rel="stylesheet" href="{{ asset('vendors/plugins/daterangepicker/daterangepicker.css') }}">
 
         <link rel="stylesheet" href="{{ asset('vendors/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
@@ -102,6 +105,9 @@
 <script src="{{ asset('vendors/plugins/bootstrap-switch/js/bootstrap-switch.min.js') }}"></script>
 <!-- bs-custom-file-input -->
 <script src="{{ asset('vendors/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+<!-- Toastr -->
+<script src="{{ asset('vendors/plugins/toastr/toastr.min.js') }}"></script>
 
 <script src="{{ asset('vendors/plugins/moment/moment.min.js') }}"></script>
 <script src="{{ asset('vendors/plugins/inputmask/jquery.inputmask.min.js') }}"></script>

@@ -1,31 +1,34 @@
 @extends('app')
 @section('title', 'ข้อมูลลูกค้า')
 @section('content')
-@push('style')
-<style>
-    .img-wrapper {
-        position: relative;
-        display: inline-block;
-    }
-    .btn-tool {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        color: red;
-        background-color: rgba(255, 255, 255, 0.7);
-        border-radius: 50%;
-        padding: 5px;
-    }
-    .btn-tool:hover {
-        color: darkred;
-    }
-    .img-fluid {
-        display: block;
-        max-width: 100%;
-        height: auto;
-    }
-</style>
-@endpush
+    @push('style')
+        <style>
+            .img-wrapper {
+                position: relative;
+                display: inline-block;
+            }
+
+            .btn-tool {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                color: red;
+                background-color: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                padding: 5px;
+            }
+
+            .btn-tool:hover {
+                color: darkred;
+            }
+
+            .img-fluid {
+                display: block;
+                max-width: 100%;
+                height: auto;
+            }
+        </style>
+    @endpush
 
     <div class="content-header">
         <div class="container-fluid">
@@ -195,11 +198,16 @@
 
                                                 </button>
                                                 <a href="{{ $Customer->maps }}" target="_blank"
-                                                    class="btn bg-gradient-success btn-sm" title="โลเคชั่น">
+                                                    class="btn bg-gradient-indigo btn-sm" title="โลเคชั่น">
                                                     <i class="fa fa-location-dot">
                                                     </i>
 
                                                 </a>
+                                                <button class="btn bg-gradient-navy btn-sm" title="สถานะ">
+                                                    <i class="fa fa-refresh">
+                                                    </i>
+
+                                                </button>
 
                                                 <button class="btn bg-gradient-info btn-sm edit-item"
                                                     data-id="{{ $Customer->id }}" title="แก้ไข">
@@ -842,29 +850,51 @@
 
                     // $('#imgshow-1').attr('src', data.img_ref.url);
 
-                    var imgRefs = data.img_ref;
-                    var container = $('#image-container');
+                    const imgRefs = data.img_ref;
+                    const container = $('#image-container');
                     container.empty();
 
                     imgRefs.forEach((img, index) => {
-                        var imgWrapper = $('<div>', {
+                        const imgWrapper = $('<div>', {
                             class: 'col-md-3',
                             id: `img-wrapper-${index + 1}`
                         });
-                        var imgElement = $('<img>', {
+                        const imgElement = $('<img>', {
                             class: 'img-fluid mb-1',
                             id: `imgshow-${index + 1}`,
                             // src: 'images/'+img.url,
-                            src:`{{ asset('storage/images') }}/${img.url}`,
+                            src: `{{ asset('storage/images') }}/${img.url}`,
                             name: `imgshow-${index + 1}`
                         });
-                        var deleteButton = $('<a>', {
+                        const deleteButton = $('<a>', {
                             href: '#',
-                            class: 'float-right btn-tool',
+                            class: 'btn-tool',
                             html: '<i class="fas fa-times"></i>',
                             click: function(event) {
                                 event.preventDefault();
-                                $(`#img-wrapper-${index + 1}`).remove();
+                                const imgId = img.id;
+                                //console.log(imgId);
+                                $.ajax({
+                                    url: 'customers/delete-image/' +
+                                        imgId,
+                                    type: 'DELETE',
+                                    success: function(result) {
+                                        $(`#img-wrapper-${index + 1}`)
+                                            .remove();
+                                        toastr.success(result
+                                            .message);
+
+                                    },
+                                    error: function(xhr, status,
+                                    error) {
+                                        console.error(xhr
+                                            .responseText);
+
+                                        toastr.error(xhr
+                                            .responseJSON
+                                            .message);
+                                    }
+                                });
                             }
                         });
 

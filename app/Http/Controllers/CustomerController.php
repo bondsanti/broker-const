@@ -217,7 +217,7 @@ class CustomerController extends Controller
     }
 
 
-    public function delImg($id)
+    public function deleteImg($id)
     {
         try {
             $image = Image::findOrFail($id);
@@ -225,13 +225,13 @@ class CustomerController extends Controller
             Storage::delete('public/images/' . $image->url);
 
             $image->delete();
-            return response()->json(['success' => 'ลบรูปสำเร็จ'],200);
+            return response()->json(['message' => 'ลบรูปสำเร็จ'],200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error ไม่สามารถลบรูปได้'], 500);
+            return response()->json(['message' => 'Error ไม่สามารถลบรูปได้'], 500);
         }
     }
 
-    public function delFile($id)
+    public function deleteFile($id)
     {
         try {
             $file = File::findOrFail($id);
@@ -239,9 +239,9 @@ class CustomerController extends Controller
             Storage::delete('public/files/' . $file->url);
 
             $file->delete();
-            return response()->json(['success' => 'ลบไฟล์สำเร็จ'],200);
+            return response()->json(['message' => 'ลบไฟล์สำเร็จ'],200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error ไม่สามารถลบไฟล์ได้'], 500);
+            return response()->json(['message' => 'Error ไม่สามารถลบไฟล์ได้'], 500);
         }
     }
 }
