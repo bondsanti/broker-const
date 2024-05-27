@@ -18,6 +18,13 @@
                 padding: 5px;
             }
 
+            .btn-tool2 {
+
+                color: red;
+                background-color: rgba(255, 255, 255, 0.7);
+
+            }
+
             .btn-tool:hover {
                 color: darkred;
             }
@@ -184,15 +191,16 @@
                                         <tr class="text-center">
                                             <td width="5%">{{ $loop->index + 1 }}</td>
                                             <td>{{ $Customer->cus_no }}</td>
-                                            <td></td>
-                                            <td>{{ $Customer->onsite_date }}</td>
+                                            <td>{{ $Customer->cus_date ? $Customer->cus_date : '-' }}</td>
+                                            <td>{{ $Customer->onsite_date ? $Customer->onsite_date : '-'}}</td>
                                             <td>{{ $Customer->cus_name }}</td>
                                             <td>{{ $Customer->status }}</td>
                                             <td>{{ optional($Customer->notify_ref)->name }}</td>
                                             <td>{{ $Customer->location }}</td>
-                                            <td>{{ number_format($Customer->budget) }}</td>
+                                            <td>{{ number_format($Customer->budget ?? 0) }}</td>
                                             <td width="15%" class="text-center">
-                                                <button class="btn bg-gradient-primary btn-sm" title="รายละเอียด">
+                                                <button class="btn bg-gradient-success btn-sm show-item"
+                                                    title="รายละเอียด" data-id="{{ $Customer->id }}">
                                                     <i class="fa fa-circle-info">
                                                     </i>
 
@@ -203,7 +211,7 @@
                                                     </i>
 
                                                 </a>
-                                                <button class="btn bg-gradient-navy btn-sm" title="สถานะ">
+                                                <button class="btn bg-gradient-primary btn-sm" title="สถานะ">
                                                     <i class="fa fa-refresh">
                                                     </i>
 
@@ -452,8 +460,8 @@
                                                 <label for="inputEmail3" class="col-form-label">รูปภาพ</label>
                                                 <div class="input-group">
                                                     <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="images"
-                                                            name="images" accept=".jpg, .jpeg, .png" multiple>
+                                                        <input type="file" class="custom-file-input" id="images_edit"
+                                                            name="images_edit" accept=".jpg, .jpeg, .png" multiple>
                                                         <label class="custom-file-label" for="images">Choose
                                                             JPG, PNG</label>
                                                     </div>
@@ -469,14 +477,18 @@
                                                 <label for="inputEmail3" class="col-form-label">เอกสารแนบ</label>
                                                 <div class="input-group">
                                                     <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="files"
-                                                            name="files" accept=".pdf" multiple>
+                                                        <input type="file" class="custom-file-input" id="files_edit"
+                                                            name="files_edit" accept=".pdf" multiple>
                                                         <label class="custom-file-label" for="exampleInputFile">Choose
                                                             PDF</label>
                                                     </div>
 
                                                 </div>
                                                 <p class="text-danger mt-1">สามารถเลือกได้หลายไฟล์</p>
+                                                <div class="row mailbox-attachment-info" id="file-container">
+
+                                                </div>
+
                                             </div>
 
                                         </div>
@@ -524,7 +536,7 @@
                             <div class="modal-footer justify-content-between">
                                 <button type="button" class="btn bg-gradient-danger" data-dismiss="modal"><i
                                         class="fa fa-times"></i> ยกเลิก</button>
-                                <button type="button" class="btn bg-gradient-success" id="savedata" value="create"><i
+                                <button type="button" class="btn bg-gradient-success" id="updatedata"><i
                                         class="fa fa-save"></i> บันทึก</button>
                             </div>
 
@@ -537,144 +549,65 @@
 
             <!-- modal info -->
             <div class="modal fade" id="modal-info">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog modal-md">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">เพิ่มข้อมูล ลูกค้า</h5>
+                            <h5 class="modal-title">รายละเอียด ลูกค้า</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <form id="createForm" name="createForm" class="form-horizontal" enctype="multipart/form-data">
-                            @csrf
-
-                            <div class="modal-body">
-                                <div class="box-body">
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">ชื่อ-สกุล</label>
-                                                <input type="text" class="col-md-12 form-control" id="cus_name"
-                                                    name="cus_name" placeholder="" autocomplete="off">
-                                                <p class="text-danger mt-1 cus_name_err"></p>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">เบอร์โทรศัพท์</label>
-                                                <input type="text" class="col-md-12 form-control" id="tel"
-                                                    name="tel" placeholder="" autocomplete="off">
-                                                <p class="text-danger mt-1 tel_err"></p>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">เลือกลักษณะงาน</label>
-                                                <select class="col-md-12 form-control" name="notify_id" id="notify_id">
-                                                    <option value="">เลือก</option>
-                                                    @foreach ($Notify as $Notifys)
-                                                        <option value="{{ $Notifys->id }}">{{ $Notifys->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <p class="text-danger mt-1 notify_err"></p>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">งบประมาณ</label>
-                                                <input type="text" class="col-md-12 form-control" id="budget"
-                                                    name="budget" placeholder="" autocomplete="off"
-                                                    onkeyup="this.value = Commas(this.value)">
-                                                <p class="text-danger mt-1 budget_err"></p>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">สถานที่</label>
-                                                <input type="text" class="col-md-12 form-control" id="location"
-                                                    name="location" placeholder="" autocomplete="off">
-                                                <p class="text-danger mt-1 location_err"></p>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">ลิงค์ Location</label>
-                                                <input type="text" class="col-md-12 form-control" id="maps"
-                                                    name="maps" placeholder="" autocomplete="off">
-                                                <p class="text-danger mt-1 maps_err"></p>
-
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label for="inputEmail3" class="col-form-label">รูปภาพ</label>
-                                                <div class="input-group">
-                                                    <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="images"
-                                                            name="images" accept=".jpg, .jpeg, .png" multiple>
-                                                        <label class="custom-file-label" for="images">Choose
-                                                            JPG, PNG</label>
-                                                    </div>
-
-                                                </div>
-
-                                                <p class="text-danger mt-1">สามารถเลือกได้หลายรูป</p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="inputEmail3" class="col-form-label">เอกสารแนบ</label>
-                                                <div class="input-group">
-                                                    <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="files"
-                                                            name="files" accept=".pdf" multiple>
-                                                        <label class="custom-file-label" for="exampleInputFile">Choose
-                                                            PDF</label>
-                                                    </div>
-
-                                                </div>
-                                                <p class="text-danger mt-1">สามารถเลือกได้หลายไฟล์</p>
-                                            </div>
-
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label for="inputEmail3" class="col-form-label">วันที่ลูกค้าเข้า</label>
-
-                                                <input type="text" class="col-md-12 form-control datepicker"
-                                                    id="cus_date" name="cus_date" placeholder="" autocomplete="off">
-                                                <p class="text-danger mt-1 cus_date_err"></p>
 
 
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="inputEmail3" class="col-form-label">วันที่นัดเข้างาน</label>
-                                                <input type="text" class="col-md-12 form-control datepicker"
-                                                    id="onsite_date" name="onsite_date" placeholder=""
-                                                    autocomplete="off">
-                                                <p class="text-danger mt-1 onsite_date_err"></p>
-                                            </div>
+                        <div class="modal-body">
+                            <dl class="row">
+                                <dt class="col-sm-4">สถานะงาน</dt>
+                                <dd class="col-sm-8">
+                                    <h6><span class="badge bg-yellow" id="status_s"></span></h6>
+                                </dd>
+                                <dt class="col-sm-4">รหัสลูกค้า</dt>
+                                <dd class="col-sm-8">
+                                    <h6><span class="badge bg-blue" id="cus_no_s"></span></h6>
+                                </dd>
+                                <dt class="col-sm-4">ชื่อ-สกุล</dt>
+                                <dd class="col-sm-8">คุณ<span id="cus_name_s"></span></dd>
+                                <dt class="col-sm-4">เบอร์โทร</dt>
+                                <dd class="col-sm-8"><span id="tel_s"></span></dd>
+                                <dt class="col-sm-4">งบประมาณ</dt>
+                                <dd class="col-sm-8"><span id="budget_s"></span> บาท</dd>
+                                <dt class="col-sm-4">งาน</dt>
+                                <dd class="col-sm-8"><span id="job_s"></span></dd>
+                                <dt class="col-sm-4">สถานที่/แผนที่</dt>
+                                <dd class="col-sm-8"><a id="maps_s" href="" target="_blank"
+                                        class="btn bg-gradient-danger btn-sm" title="โลเคชั่น">
+                                        <i class="fa fa-location-dot">
+                                        </i> <span id="location_s"></span>
 
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <label for="inputEmail3" class="col-form-label">รายละเอียด</label>
-                                                <textarea id="summernote" name="detail" class="col-md-12 form-control">
-                                                              </textarea>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <label for="inputEmail3" class="col-form-label">หมายเหตุ</label>
-                                                <input type="text" class="col-md-12 form-control" id="remark"
-                                                    name="remark" placeholder="" autocomplete="off">
+                                    </a></dd>
+                                    <dt class="col-sm-4">วันที่เข้าหน้างาน</dt>
+                                    <dd class="col-sm-8"><span id="onsite_date_s"></span></dd>
+                                    <dt class="col-sm-4">วันที่ลูกค้าเข้า</dt>
+                                    <dd class="col-sm-8"><span id="cus_date_s"></span></dd>
+                                <dt class="col-sm-4">รายละเอียด</dt>
+                                <dd class="col-sm-8"><span id="detail_s"></span></dd>
 
-                                            </div>
-                                        </div>
+                            </dl>
 
-                                    </div>
+                            <div class="row col-12">
+
+                                <div class="col-12">
+                                    <img src="" class="product-image" alt="Product Image">
+                                </div>
+                                <div class="product-image-thumbs" id="image-container-show">
+
 
 
                                 </div>
                             </div>
-                            <div class="modal-footer justify-content-between">
-                                <button type="button" class="btn bg-gradient-danger" data-dismiss="modal"><i
-                                        class="fa fa-times"></i> ยกเลิก</button>
-                                <button type="button" class="btn bg-gradient-success" id="savedata" value="create"><i
-                                        class="fa fa-save"></i> บันทึก</button>
-                            </div>
 
-                        </form>
+
+                        </div>
+
                     </div>
                     <!-- /.modal-content -->
                 </div>
@@ -700,11 +633,10 @@
             });
         });
 
-        function Commas(str) {
-            // เปลี่ยนทุกคำว่า "," เป็น ""
-            str = str.replace(/,/g, "");
+        function Commas(number) {
 
-            var parts = str.split(".");
+            const str = number.toString().replace(/,/g, "");
+            const parts = str.split(".");
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             return parts.join(".");
         }
@@ -828,6 +760,68 @@
                 });
             });
 
+            //ShowDetail
+            $('body').on('click', '.show-item', function() {
+
+                const id = $(this).data('id');
+                //console.log(id);
+                $('#modal-info').modal('show');
+                $.get('customers/' + id, function(data) {
+                    //console.log(data);
+                    $('#cus_no_s').text(data.cus_no);
+                    $('#cus_name_s').text(data.cus_name);
+                    $('#tel_s').text(data.tel);
+                    $('#status_s').text(data.status);
+                    $('#budget_s').text(Commas(data.budget));
+                    $('#job_s').text(data.notify_ref ? data.notify_ref.name : '-');
+
+                    $('#maps_s').attr('href', data.maps);
+                    $('#cus_date_s').text(data.cus_date ? data.cus_date : '-');
+                    $('#onsite_date_s').text(data.onsite_date ? data.onsite_date : '-');
+                    $('#location_s').text(data.location);
+                    $('#detail_s').html(data.detail);
+                    $('#remark_s').text(data.remark);
+
+                    // $('#imgshow-1').attr('src', data.img_ref.url);
+
+                    var container = $('#image-container-show');
+                    container.empty();
+
+                    // Append image references
+                    var imgRefs = data.img_ref;
+                    imgRefs.forEach((img, index) => {
+                        const imgWrapper = $('<div>', {
+                            class: 'col-md-2',
+                            id: `img-wrapper-${index + 1}`
+                        });
+                        const imgElement = $('<img>', {
+                            class: 'product-image-thumb mb-1',
+                            id: `imgshow-${index + 1}`,
+                            src: `{{ asset('storage/images') }}/${img.url}`,
+                            name: `imgshow-${index + 1}`
+                        });
+
+                        imgWrapper.append(imgElement);
+                        container.append(imgWrapper);
+
+                        // Set the first image as active and display it as the main image
+                        if (index === 0) {
+                            imgElement.addClass('active');
+                            $('.product-image').prop('src', imgElement.attr('src'));
+                        }
+
+                        imgElement.on('click', function() {
+                            $('.product-image').prop('src', $(this).attr('src'));
+                            $('.product-image-thumb.active').removeClass('active');
+                            $(this).addClass('active');
+                        });
+                    });
+
+
+                });
+
+
+            });
 
             //Edit
             $('body').on('click', '.edit-item', function() {
@@ -836,7 +830,7 @@
                 //console.log(id);
                 $('#modal-edit').modal('show');
                 $.get('customers/' + id, function(data) {
-                    console.log(data.img_ref);
+                    //console.log(data);
                     $('#id_edit').val(data.id);
                     $('#cus_name_edit').val(data.cus_name);
                     $('#tel_edit').val(data.tel);
@@ -851,8 +845,11 @@
                     // $('#imgshow-1').attr('src', data.img_ref.url);
 
                     const imgRefs = data.img_ref;
+                    const fileRefs = data.file_ref;
                     const container = $('#image-container');
+                    const fcontainer = $('#file-container');
                     container.empty();
+                    fcontainer.empty();
 
                     imgRefs.forEach((img, index) => {
                         const imgWrapper = $('<div>', {
@@ -886,7 +883,7 @@
 
                                     },
                                     error: function(xhr, status,
-                                    error) {
+                                        error) {
                                         console.error(xhr
                                             .responseText);
 
@@ -902,6 +899,49 @@
                         container.append(imgWrapper);
                     });
 
+                    fileRefs.forEach((file, index) => {
+                        const fileWrapper = $('<div>', {
+                            class: 'col-md-12',
+                            id: `file-wrapper-${index + 1}`
+                        });
+                        const fileElement = $(`<a>`, {
+                            href: `{{ asset('storage/files') }}/${file.url}`,
+                            class: 'mailbox-attachment-name',
+                            html: `<i class="far fa-file-pdf mb-1"></i> ${file.url}`
+                        });
+                        const deleteButton = $('<a>', {
+                            href: '#',
+                            class: 'btn btn-sm center-right',
+                            html: '<i class="fas fa-times btn-tool2"></i>',
+                            click: function(event) {
+                                event.preventDefault();
+                                const fileId = file.id;
+                                $.ajax({
+                                    url: 'customers/delete-file/' +
+                                        fileId,
+                                    type: 'DELETE',
+                                    success: function(result) {
+                                        $(`#file-wrapper-${index + 1}`)
+                                            .remove();
+                                        toastr.success(result
+                                            .message);
+                                    },
+                                    error: function(xhr, status,
+                                        error) {
+                                        console.error(xhr
+                                            .responseText);
+                                        toastr.error(xhr
+                                            .responseJSON
+                                            .message);
+                                    }
+                                });
+                            }
+                        });
+
+                        fileWrapper.append(fileElement).append(deleteButton);
+                        fcontainer.append(fileWrapper);
+                    });
+
                     if (data.notify_id == null || data.notify_id === "") {
                         $('#notify_id_edit option[value=""]').prop('selected', true);
                     } else {
@@ -911,6 +951,82 @@
                 });
 
 
+            });
+
+            // //updateData
+            $('#updatedata').click(function(e) {
+                e.preventDefault();
+                $(this).html('รอสักครู่..');
+
+                const formData = new FormData($('#editForm')[0]);
+                // รับไฟล์รูปภาพ
+                const images = $('#images_edit')[0].files;
+                $.each(images, function(index, image) {
+                    formData.append('images_edit[]', image);
+                });
+
+                // รับไฟล์เอกสาร
+                const files = $('#files_edit')[0].files;
+                $.each(files, function(index, file) {
+                    formData.append('files_edit[]', file);
+                });
+
+
+                $.ajax({
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    url: "{{ route('customers.update') }}",
+                    type: "POST",
+                    dataType: 'json',
+
+                    success: function(data) {
+                        //console.log(data);
+                        if (data.success = true) {
+
+                            if ($.isEmptyObject(data.error)) {
+                                Swal.fire({
+
+                                    icon: 'success',
+                                    title: data.message,
+                                    showConfirmButton: true,
+                                    timer: 2500
+                                });
+                                $('#modal-edit').trigger("reset");
+                                $('#modal-edit').modal('hide');
+                                //tableUser.draw();
+                                setTimeout("location.href = '{{ route('customers') }}';",
+                                    1500);
+                            } else {
+                                printErrorMsg(data.error);
+                                // $('.name_edit_err').text(data.error.name_edit);
+                                $('#modal-edit').trigger("reset");
+                                $('#updatedata').html('ลองอีกครั้ง');
+
+                                Swal.fire({
+                                    position: 'top-center',
+                                    icon: 'error',
+                                    title: 'ไม่สามารถบันทึกข้อมูลได้',
+                                    html: `เนื่องจากกรอกข้อมูลไม่ครบถ้วน`,
+                                    timer: 2500
+                                });
+                            }
+
+                        } else {
+                            Swal.fire({
+                                position: 'top-center',
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด!',
+                                showConfirmButton: true,
+                                timer: 2500
+                            });
+                            $('#editForm').trigger("reset");
+                        }
+
+
+                    },
+
+                });
             });
 
 

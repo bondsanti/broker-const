@@ -117,39 +117,69 @@ class CustomerController extends Controller
 
     public function update(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-            'code_edit' => 'required',
-            'role_type_edit' => 'required',
+            'cus_name_edit' => 'required',
+            'tel_edit' => 'required',
+            'notify_id_edit' => 'required',
+            'budget_edit' => 'required',
+            'location_edit' => 'required',
         ], [
-            'code_edit.required' => 'กรุณากรอกรหัสพนักงาน',
-            'role_type_edit.required' => 'กรุณาเลือกสิทธิ์การใช้งาน',
+            'cus_name_edit.required' => 'กรุณากรอกชื่อลูกค้า',
+            'tel_edit.required' => 'กรุณากรอกเบอร์โทรศัพท์',
+            'notify_id_edit.required' => 'กรุณาเลือกลักษณะงาน',
+            'budget_edit.required' => 'กรุณากรอกงบประมาณ',
+            'location_edit.required' => 'กรุณากรอกสถานที่',
+
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
         }
 
-        $user = User::where('code', $request->code_edit)->where('active', 1)->first();
+        $budget = str_replace(',', '', $request->budget_edit);
 
-        if (!$user) {
-            return response()->json(['message' => 'ไม่พบผู้ใช้งาน'], 400);
-        }
+        $Customers = Customer::where('id', $request->id_edit)->first();
+        $Customers->cus_name = $request->cus_name_edit;
+        $Customers->tel = $request->tel_edit;
+        $Customers->notify_id = $request->notify_id_edit;
+        $Customers->budget = $budget;
+        $Customers->location = $request->location_edit;
+        $Customers->maps = $request->maps_edit;
+        $Customers->detail = $request->detail_edit;
+        $Customers->remark = $request->remark_edit;
+        $Customers->save();
+        $Customers->refresh();
 
-        // $existingRole = Role_user::where('user_id', $user->id)->where('role_type', $request->role_type_edit)->first();
+         //รูปภาพ
+         if ($request->hasFile('images_edit')) {
+            foreach ($request->file('images_edit') as $image) {
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                // Save the image to storage
+                // $image->storeAs('public/images', $filename);
+                Storage::putFileAs('public/images', $image, $filename);
+                Image::create([
+                    'cus_id' => $Customers->id,
+                    'url' => $filename,
+                ]);
+            }
+            } else {
+                // กรณีไม่มีไฟล์ที่อัปโหลด
+            }
 
-        // if ($existingRole) {
-        //     return response()->json(['message' => 'มีผู้ใช้ท่านนี้อยู่ในระบบแล้ว'], 400);
-        // }
+            //ไฟล์
+            if ($request->hasFile('files_edit')) {
+                foreach ($request->file('files_edit') as $file) {
+                    $filename2 = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-        //dd($request->all());
-
-        // Log::addLog(Session::get('loginId'), 'Create User', $roleUser);
-
-        $roleUser = Role_user::where('id', $request->id_edit)->first();
-        $roleUser->user_id = $user->id;
-        $roleUser->role_type = $request->role_type_edit;
-        $roleUser->save();
+                    Storage::putFileAs('public/files', $file, $filename2);
+                    File::create([
+                        'cus_id' => $Customers->id,
+                        'url' => $filename2,
+                    ]);
+                }
+            } else {
+                // กรณีไม่มีไฟล์ที่อัปโหลด
+            }
 
         return response()->json(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว'], 201);
     }
@@ -215,7 +245,6 @@ class CustomerController extends Controller
 
 
     }
-
 
     public function deleteImg($id)
     {
