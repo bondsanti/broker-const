@@ -4,16 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Email;
+use App\Models\Role_user;
 use App\Notifications\OverSlaNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Session;
 
 class MainController extends Controller
 {
     public function index(Request $request)
     {
+        $dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+
+
         $data = [];
         $overSlaCount = 0;
 
@@ -49,7 +54,7 @@ class MainController extends Controller
 
 
 
-        return view('main.index', compact('data', 'overSlaCount','countRenovate', 'countBstrature', 'countDesign'));
+        return view('main.index', compact('dataLoginUser','data', 'overSlaCount','countRenovate', 'countBstrature', 'countDesign'));
     }
 
 

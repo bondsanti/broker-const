@@ -60,8 +60,8 @@
             <p>Days passed: {{ $daysDiff }}</p>
             <p>ผู้เกี่ยวข้องโปรดดำเนินการ....</p>
             <hr>
-            <h3>Regards,<br>
-                Broker-Const. System</h3>
+            <p>Regards,<br>
+                Broker-Const. System</p>
         </div>
 
     </div>

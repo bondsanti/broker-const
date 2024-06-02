@@ -12,7 +12,7 @@ class Email extends Model
     protected $table = 'emails';
 
     protected $fillable = [
-        'email', 'status',
+        'email', 'active',
     ];
 
 }

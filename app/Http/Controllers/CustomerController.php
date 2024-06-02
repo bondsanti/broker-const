@@ -6,16 +6,19 @@ use App\Models\Customer;
 use App\Models\File;
 use App\Models\Image;
 use App\Models\Notify;
+use App\Models\Role_user;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Session;
 
 class CustomerController extends Controller
 {
     public function index(Request $request)
     {
+        $dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+
         $status = $request->input('status', []);
         $notify_ids = $request->input('notify_id', []);
         $date_select = $request->input('date_select', '');
@@ -75,7 +78,7 @@ class CustomerController extends Controller
 
         $Customers = $query->orderBy('id', 'desc')->get();
         //dd($Customers);
-        return view('customers.index', compact('Notify', 'Customers'));
+        return view('customers.index', compact('dataLoginUser','Notify', 'Customers'));
     }
 
     public function store(Request $request)

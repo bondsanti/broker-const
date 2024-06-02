@@ -7,6 +7,7 @@ use Session;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notify;
 use App\Models\Log;
+use App\Models\Role_user;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -15,10 +16,11 @@ class NotifyController extends Controller
 {
     public function index()
     {
+        $dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
 
-     $Notify = Notify::orderBy('id', 'desc')->get();
-     $Emails = DB::table('emails')->orderBy('id', 'desc')->get();
-     return view('notify.index',compact('Notify','Emails'));
+        $Notify = Notify::orderBy('id', 'desc')->get();
+        $Emails = DB::table('emails')->orderBy('id', 'desc')->get();
+        return view('notify.index', compact('dataLoginUser','Notify', 'Emails'));
     }
 
     public function store(Request $request)
@@ -91,7 +93,7 @@ class NotifyController extends Controller
         $Notify->sla = $request->sla_edit;
         $Notify->save();
 
-                // Log::addLog(Session::get('loginId'), 'Create User', $roleUser);
+        // Log::addLog(Session::get('loginId'), 'Create User', $roleUser);
 
         return response()->json(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว'], 201);
     }
@@ -175,5 +177,4 @@ class NotifyController extends Controller
             'message' => 'ลบข้อมูลสำเร็จ'
         ], 201);
     }
-
 }
