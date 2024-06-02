@@ -46,6 +46,15 @@
                         </p>
                     </a>
                 </li>
+                {{-- <li class="nav-item">
+                    <a href="{{route('customers')}}" class="nav-link {{ request()->routeIs('customers') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>
+                            รายงาน
+
+                        </p>
+                    </a>
+                </li> --}}
                   <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }} {{ request()->routeIs('notify') ? 'menu-open' : '' }}">
                       <a href="#" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }} {{ request()->routeIs('notify') ? 'active' : '' }}">
                           <i class="nav-icon fas fa-cogs"></i>

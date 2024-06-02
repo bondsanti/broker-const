@@ -11,4 +11,8 @@ class Email extends Model
     protected $connection = 'mysql';
     protected $table = 'emails';
 
+    protected $fillable = [
+        'email', 'status',
+    ];
+
 }

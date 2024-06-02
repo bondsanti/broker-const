@@ -63,7 +63,7 @@
                             <h3 class="card-title">ค้นหา ข้อมูล</h3>
 
                         </div>
-                        <form action="=" method="post" id="searchForm">
+                        <form method="GET" action="{{ route('customers') }}" id="searchForm">
                             @csrf
                             <div class="card-body">
 
@@ -72,41 +72,60 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>ชื่อลูกค้า</label>
-                                            <input class="form-control" name="name_customer" type="text" value=""
+                                            <input class="form-control" name="name_customer" type="text"
+                                                value="{{ old('name_customer', request()->get('name_customer', '')) }}"
                                                 placeholder="ชื่อลูกค้า">
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>เบอร์โทรศัพท์</label>
-                                            <input class="form-control" name="phone_customer" type="text" value=""
+                                            <input class="form-control" name="phone_customer" type="text"
+                                                value="{{ old('phone_customer', request()->get('phone_customer', '')) }}"
                                                 placeholder="เบอร์โทรศัพท์">
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>สถานะ</label>
-                                            <select id="status" name="status" class="select2" multiple="multiple"
+                                            <select id="status" name="status[]" class="select2" multiple="multiple"
                                                 data-placeholder="เลือกสถานะ" style="width: 100%;">
-                                                <option value="">ทั้งหมด</option>
-                                                <option value="อยู่ระหว่างประสานงาน">อยู่ระหว่างประสานงาน</option>
-                                                <option value="อยู่ระหว่างทำแบบ Draft">อยู่ระหว่างทำแบบ Draft</option>
-                                                <option value="อยู่ระหว่างเสนอราคา">อยู่ระหว่างเสนอราคา</option>
-                                                <option value="พัฒนาแบบ">พัฒนาแบบ</option>
-                                                <option value="เสนอแบบ">เสนอแบบ</option>
-                                                <option value="เซ็นสัญญาแล้ว">เซ็นสัญญาแล้ว</option>
-                                                <option value="ยกเลิก">ยกเลิก</option>
+                                                <option value="อยู่ระหว่างประสานงาน"
+                                                    {{ in_array('อยู่ระหว่างประสานงาน', (array) old('status', request()->get('status', []))) ? 'selected' : '' }}>
+                                                    อยู่ระหว่างประสานงาน</option>
+                                                <option value="อยู่ระหว่างทำแบบ Draft"
+                                                    {{ in_array('อยู่ระหว่างทำแบบ Draft', (array) old('status', request()->get('status', []))) ? 'selected' : '' }}>
+                                                    อยู่ระหว่างทำแบบ Draft</option>
+                                                <option value="อยู่ระหว่างเสนอราคา"
+                                                    {{ in_array('อยู่ระหว่างเสนอราคา', (array) old('status', request()->get('status', []))) ? 'selected' : '' }}>
+                                                    อยู่ระหว่างเสนอราคา</option>
+                                                <option value="พัฒนาแบบ"
+                                                    {{ in_array('พัฒนาแบบ', (array) old('status', request()->get('status', []))) ? 'selected' : '' }}>
+                                                    พัฒนาแบบ</option>
+                                                <option value="เสนอแบบ"
+                                                    {{ in_array('เสนอแบบ', (array) old('status', request()->get('status', []))) ? 'selected' : '' }}>
+                                                    เสนอแบบ</option>
+                                                <option value="เซ็นสัญญาแล้ว"
+                                                    {{ in_array('เซ็นสัญญาแล้ว', (array) old('status', request()->get('status', []))) ? 'selected' : '' }}>
+                                                    เซ็นสัญญาแล้ว</option>
+                                                <option value="ยกเลิก"
+                                                    {{ in_array('ยกเลิก', (array) old('status', request()->get('status', []))) ? 'selected' : '' }}>
+                                                    ยกเลิก</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>เลือกลักษณะงาน</label>
-                                            <select name="notify_id" id="notify_id" class="select2" multiple="multiple"
+                                            <select name="notify_id[]" id="notify_id" class="select2" multiple="multiple"
                                                 data-placeholder="เลือกลักษณะงาน" style="width: 100%;">
-                                                <option value="ทั้งหมด">ทั้งหมด</option>
+                                                <option value=""
+                                                    {{ in_array('', (array) old('notify_id', request()->get('notify_id', []))) ? 'selected' : '' }}>
+                                                    ทั้งหมด</option>
                                                 @foreach ($Notify as $Notifys)
-                                                    <option value="{{ $Notifys->id }}">{{ $Notifys->name }}</option>
+                                                    <option value="{{ $Notifys->id }}"
+                                                        {{ in_array($Notifys->id, (array) old('notify_id', request()->get('notify_id', []))) ? 'selected' : '' }}>
+                                                        {{ $Notifys->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -118,10 +137,18 @@
                                         <div class="form-group">
                                             <label>เลือกประเภท วันที่</label>
                                             <select name="date_select" id="date_select" class="form-control">
-                                                <option value="">ทั้งหมด</option>
-                                                <option value="bid_date">วันที่ลูกค้าเข้า</option>
-                                                <option value="status_date">วันที่อัพเดทสถานะ</option>
-                                                <option value="onsite_date">วันที่เข้าหน้างาน</option>
+                                                <option value=""
+                                                    {{ old('date_select', request()->get('date_select', '')) == '' ? 'selected' : '' }}>
+                                                    ทั้งหมด</option>
+                                                <option value="cus_date"
+                                                    {{ old('date_select', request()->get('date_select', '')) == 'cus_date' ? 'selected' : '' }}>
+                                                    วันที่ลูกค้าเข้า</option>
+                                                <option value="status_date"
+                                                    {{ old('date_select', request()->get('date_select', '')) == 'status_date' ? 'selected' : '' }}>
+                                                    วันที่อัพเดทสถานะ</option>
+                                                <option value="onsite_date"
+                                                    {{ old('date_select', request()->get('date_select', '')) == 'onsite_date' ? 'selected' : '' }}>
+                                                    วันที่เข้าหน้างาน</option>
                                             </select>
                                         </div>
                                     </div>
@@ -129,14 +156,17 @@
                                         <div class="form-group">
                                             <label>วันที่เริ่มต้น</label>
                                             <input class="form-control datepicker" name="startdate" id="startdate"
-                                                type="text" value="" placeholder="วันที่เริ่มต้น">
+                                                type="text"
+                                                value="{{ old('startdate', request()->get('startdate', '')) }}"
+                                                placeholder="วันที่เริ่มต้น">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="ถึงช่วงราคา-group">
                                             <label>ถึงวันที่</label>
                                             <input class="form-control datepicker" name="enddate" id="enddate"
-                                                type="text" value="" placeholder="ถึงวันที่">
+                                                type="text" value="{{ old('enddate', request()->get('enddate', '')) }}"
+                                                placeholder="ถึงวันที่">
                                         </div>
                                     </div>
                                 </div>
@@ -147,8 +177,8 @@
                                             <button type="submit" class="btn bg-gradient-success"><i
                                                     class="fa fa-search"></i>
                                                 ค้นหา</button>
-                                            <a href="" type="button" class="btn bg-gradient-danger"><i
-                                                    class="fa fa-refresh"></i> เคลียร์</a>
+                                            <a href="{{ route('customers') }}" type="button"
+                                                class="btn bg-gradient-danger"><i class="fa fa-refresh"></i> เคลียร์</a>
                                         </div>
 
                                     </div>
@@ -192,7 +222,7 @@
                                             <td width="5%">{{ $loop->index + 1 }}</td>
                                             <td>{{ $Customer->cus_no }}</td>
                                             <td>{{ $Customer->cus_date ? $Customer->cus_date : '-' }}</td>
-                                            <td>{{ $Customer->onsite_date ? $Customer->onsite_date : '-'}}</td>
+                                            <td>{{ $Customer->onsite_date ? $Customer->onsite_date : '-' }}</td>
                                             <td>{{ $Customer->cus_name }}</td>
                                             <td>{{ $Customer->status }}</td>
                                             <td>{{ optional($Customer->notify_ref)->name }}</td>
@@ -211,7 +241,8 @@
                                                     </i>
 
                                                 </a>
-                                                <button class="btn bg-gradient-primary btn-sm" title="สถานะ">
+                                                <button class="btn bg-gradient-primary btn-sm status-item" title="สถานะ"
+                                                    data-id="{{ $Customer->id }}" data-status="{{ $Customer->status }}">
                                                     <i class="fa fa-refresh">
                                                     </i>
 
@@ -584,10 +615,10 @@
                                         </i> <span id="location_s"></span>
 
                                     </a></dd>
-                                    <dt class="col-sm-4">วันที่เข้าหน้างาน</dt>
-                                    <dd class="col-sm-8"><span id="onsite_date_s"></span></dd>
-                                    <dt class="col-sm-4">วันที่ลูกค้าเข้า</dt>
-                                    <dd class="col-sm-8"><span id="cus_date_s"></span></dd>
+                                <dt class="col-sm-4">วันที่เข้าหน้างาน</dt>
+                                <dd class="col-sm-8"><span id="onsite_date_s"></span></dd>
+                                <dt class="col-sm-4">วันที่ลูกค้าเข้า</dt>
+                                <dd class="col-sm-8"><span id="cus_date_s"></span></dd>
                                 <dt class="col-sm-4">รายละเอียด</dt>
                                 <dd class="col-sm-8"><span id="detail_s"></span></dd>
 
@@ -654,6 +685,7 @@
             $('.datepicker').datepicker({
                 format: 'yyyy-mm-dd', // รูปแบบวันที่
                 autoclose: true,
+                todayHighlight: true
             });
 
             $('#table').DataTable({
@@ -953,7 +985,7 @@
 
             });
 
-            // //updateData
+            //updateData
             $('#updatedata').click(function(e) {
                 e.preventDefault();
                 $(this).html('รอสักครู่..');
@@ -1029,7 +1061,6 @@
                 });
             });
 
-
             //Delete
             $('body').on('click', '.delete-item', function() {
 
@@ -1083,6 +1114,101 @@
                     $('.' + key + '_err').text(value);
                 });
             }
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $('.status-item').click(function(event) {
+                event.preventDefault();
+                var customerId = $(this).data('id');
+                var currentStatus = $(this).data('status');
+
+                Swal.fire({
+                    title: 'เปลี่ยนสถานะ',
+                    input: 'select',
+                    inputOptions: {
+                        'อยู่ระหว่างประสานงาน': 'อยู่ระหว่างประสานงาน',
+                        'อยู่ระหว่างทำแบบ Draft': 'อยู่ระหว่างทำแบบ Draft',
+                        'อยู่ระหว่างเสนอราคา': 'อยู่ระหว่างเสนอราคา',
+                        'พัฒนาแบบ': 'พัฒนาแบบ',
+                        'เสนอแบบ': 'เสนอแบบ',
+                        'เซ็นสัญญาแล้ว': 'เซ็นสัญญาแล้ว',
+                        'ยกเลิก': 'ยกเลิก'
+                    },
+                    inputPlaceholder: 'เลือกสถานะ',
+                    inputValue: currentStatus,
+                    showCancelButton: true,
+                    inputValidator: function(value) {
+                        return new Promise(function(resolve) {
+                            if (value) {
+                                resolve();
+                            } else {
+                                resolve('คุณต้องเลือกสถานะ!');
+                            }
+                        });
+                    }
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        // ส่งข้อมูลไปยังเซิร์ฟเวอร์เพื่ออัปเดตสถานะ
+                        $.ajax({
+                            url: '/customers/update-status/' + customerId,
+                            method: 'POST',
+                            dataType: 'json',
+                            data: {
+                                status: result.value
+                            },
+                            success: function(data) {
+                                //console.log(data);
+                                if (data.success = true) {
+
+                                    if ($.isEmptyObject(data.error)) {
+                                        Swal.fire({
+
+                                            icon: 'success',
+                                            title: data.message,
+                                            showConfirmButton: true,
+                                            timer: 2500
+                                        });
+
+                                        //tableUser.draw();
+                                        setTimeout(
+                                            "location.href = '{{ route('customers') }}';",
+                                            1500);
+                                    } else {
+
+
+                                        Swal.fire({
+                                            position: 'top-center',
+                                            icon: 'error',
+                                            title: 'ไม่สามารถบันทึกข้อมูลได้',
+                                            html: `เนื่องจากกรอกข้อมูลไม่ครบถ้วน`,
+                                            timer: 2500
+                                        });
+                                    }
+
+                                } else {
+                                    Swal.fire({
+                                        position: 'top-center',
+                                        icon: 'error',
+                                        title: 'เกิดข้อผิดพลาด!',
+                                        showConfirmButton: true,
+                                        timer: 2500
+                                    });
+
+                                }
+
+
+                            },
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endpush

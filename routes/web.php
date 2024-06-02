@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [MainController::class,'index'])->name('main');
+Route::get('/sendEmail', [MainController::class,'notifyEmail'])->name('sendEmail');
 
 Route::prefix('/users')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('users');
@@ -47,6 +48,7 @@ Route::prefix('/customers')->group(function(){
     Route::post('/', [CustomerController::class, 'store'])->name('customers.store');
     Route::get('/{id}', [CustomerController::class, 'edit'])->name('customers.edit');
     Route::post('/update', [CustomerController::class, 'update'])->name('customers.update');
+    Route::post('/update-status/{id}', [CustomerController::class, 'updateStatus'])->name('customers.update.status');
     Route::delete('/{id}', [CustomerController::class, 'destroy'])->name('customers.destroy');
     Route::delete('delete-image/{id}', [CustomerController::class, 'deleteImg'])->name('customers.delImg');
     Route::delete('delete-file/{id}', [CustomerController::class, 'deleteFile'])->name('customers.delFile');
