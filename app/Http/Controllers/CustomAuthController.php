@@ -166,37 +166,38 @@ class CustomAuthController extends Controller
     public function AllowLoginConnect(Request $request,$id,$token)
     {
 
-        $user = User::where('code', '=', $id)->orWhere('old_code', '=', $id)->first();
+        // $user = User::where('code', '=', $id)->orWhere('old_code', '=', $id)->first();
+        $user = User::where('id', '=', $id)->first();
         //dd($user);
         if($user){
             $request->session()->put('loginId',$user->id);
             // Auth::login($user);
             // $user->last_login_at = date('Y-m-d H:i:s');
-            $user->save();
+            // $user->save();
             $checkToken = User::where('token', '=', $token)->first();
 
-            if ($checkToken) {
-                DB::table('vbeyond_report.log_login')->insert([
-                    'username' => $user->code,
-                    'dates' => date('Y-m-d'),
-                    'timeStm' => date('Y-m-d H:i:s'),
-                    'page' => 'BrokerCons'
-                ]);
+                if ($checkToken) {
+                    DB::table('vbeyond_report.log_login')->insert([
+                        'username' => $user->code,
+                        'dates' => date('Y-m-d'),
+                        'timeStm' => date('Y-m-d H:i:s'),
+                        'page' => 'BrokerCons'
+                    ]);
 
-                Log::addLog($request->session()->get('loginId'), '', 'Login AllowLoginConnect By vBisConnect');
-                return redirect('/');
-            }else{
+                    Log::addLog($request->session()->get('loginId'), '', 'Login AllowLoginConnect By vBisConnect');
+                    return redirect('/');
+                }else{
+                    $request->session()->pull('loginId');
+                    return redirect('/');
+                }
+
+
+         }else if($user->active==0){
                 $request->session()->pull('loginId');
                 return redirect('/');
-            }
-
-
-            }else if($user->active==0){
-                $request->session()->pull('loginId');
+        }else{
                 return redirect('/');
-            }else{
-                return redirect('/');
-            }
+        }
 
     }
 
