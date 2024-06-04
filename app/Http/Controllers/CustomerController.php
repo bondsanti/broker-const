@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\File;
 use App\Models\Image;
+use App\Models\Log;
+use App\Models\Log_status;
 use App\Models\Notify;
 use App\Models\Role_user;
 use App\Models\User;
@@ -176,6 +178,14 @@ class CustomerController extends Controller
         return response()->json($Customers, 200);
     }
 
+    public function logStatus($id)
+    {
+
+        $Customers = Log_status::where('cus_id',$id)->get();
+
+        return response()->json($Customers, 200);
+    }
+
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -249,12 +259,20 @@ class CustomerController extends Controller
 
     public function updateStatus(Request $request,$id)
     {
+        $Log_status = new Log_status();
+        $Log_status->user_id = Session::get('loginId');
+        $Log_status->cus_id =  $id;
+        $Log_status->status =  $request->status;
+        $Log_status->save();
+
         $Customers = Customer::find($id);
+        $Customers_old = $Customers->toArray();
         if ($Customers) {
             $Customers->status = $request->status;
             $Customers->status_date = Carbon::now()->startOfDay()->toDateString();
             $Customers->save();
 
+            Log::addLog(Session::get('loginId'),json_encode($Customers_old), 'Update Status : '.$Customers);
             return response()->json(['message' => 'อัปเดตสถานะเรียบร้อยแล้ว'], 200);
         }
     }
@@ -293,9 +311,10 @@ class CustomerController extends Controller
             $Images->delete();
         }
 
+        Log::addLog(Session::get('loginId'),json_encode($Customers_old), 'Delete Customer : '.$Customers);
 
-        // Log::addLog($user_id,json_encode($roleUser_old), 'Delete RoleUser : '.$roleUser);
         $Customers->delete($id);
+
 
         return response()->json([
             'message' => 'ลบข้อมูลสำเร็จ'

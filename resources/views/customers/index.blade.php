@@ -34,6 +34,10 @@
                 max-width: 100%;
                 height: auto;
             }
+
+            .show-logs {
+                cursor: pointer;
+            }
         </style>
     @endpush
 
@@ -119,9 +123,7 @@
                                             <label>เลือกลักษณะงาน</label>
                                             <select name="notify_id[]" id="notify_id" class="select2" multiple="multiple"
                                                 data-placeholder="เลือกลักษณะงาน" style="width: 100%;">
-                                                <option value=""
-                                                    {{ in_array('', (array) old('notify_id', request()->get('notify_id', []))) ? 'selected' : '' }}>
-                                                    ทั้งหมด</option>
+
                                                 @foreach ($Notify as $Notifys)
                                                     <option value="{{ $Notifys->id }}"
                                                         {{ in_array($Notifys->id, (array) old('notify_id', request()->get('notify_id', []))) ? 'selected' : '' }}>
@@ -213,6 +215,9 @@
                                         <th>ลักษณะงาน</th>
                                         <th>สถานที่</th>
                                         <th>งบประมาณ</th>
+                                        <th>วันที่ เพิ่มข้อมูล</th>
+                                        <th>ผ่านมาแล้ว</th>
+                                        <th>วันที่ อัพเดทสถานะ</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -228,6 +233,10 @@
                                             <td>{{ optional($Customer->notify_ref)->name }}</td>
                                             <td>{{ $Customer->location }}</td>
                                             <td>{{ number_format($Customer->budget ?? 0) }}</td>
+                                            <td>{{ $Customer->created_at ? $Customer->created_at->format('Y-m-d') : '-' }}</td>
+                                            <td>{{ $Customer->created_at->diffInDays(now()) }} วัน</td>
+                                            <td> <a data-id="{{ $Customer->id }}"
+                                                    class="show-logs">{{ $Customer->status_date }}</a></td>
                                             <td width="15%" class="text-center">
                                                 <button class="btn bg-gradient-success btn-sm show-item"
                                                     title="รายละเอียด" data-id="{{ $Customer->id }}">
@@ -378,7 +387,8 @@
 
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="inputEmail3" class="col-form-label">วันที่นัดเข้างาน</label>
+                                                <label for="inputEmail3"
+                                                    class="col-form-label">วันที่นัดเข้าหน้างาน</label>
                                                 <input type="text" class="col-md-12 form-control datepicker"
                                                     id="onsite_date" name="onsite_date" placeholder=""
                                                     autocomplete="off">
@@ -525,7 +535,8 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <label for="inputEmail3" class="col-form-label">วันที่ลูกค้าเข้า</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    วันที่นัดเข้าหน้างาน</label>
 
                                                 <input type="text" class="col-md-12 form-control datepicker"
                                                     id="cus_date_edit" name="cus_date_edit" placeholder=""
@@ -644,6 +655,37 @@
                 </div>
                 <!-- /.modal-dialog -->
             </div>
+
+            <!-- modal LogStatus -->
+            <div class="modal fade" id="modal-logs">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">ประวัติการอัพเดทสถานะ</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+
+                        <div class="modal-body">
+
+
+                            <div id="content-show">
+
+
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+
 
 
 
@@ -1108,6 +1150,42 @@
 
             });
 
+            //Showlog
+            $('body').on('click', '.show-logs', function() {
+        const id = $(this).data('id');
+        $('#modal-logs').modal('show');
+
+        $.get('customers/logs-status/' + id, function(data) {
+            const listLogs = data;
+            const container = $('#content-show');
+            container.empty();
+
+            if (listLogs.length === 0) {
+                container.text('ไม่พบข้อมูล');
+            } else {
+                // Create the table structure
+                const table = $('<table class="table table-sm"></table>');
+                const thead = $('<thead><tr><th>วันที่</th><th>สถานะ</th></tr></thead>');
+                const tbody = $('<tbody></tbody>');
+
+                table.append(thead);
+                table.append(tbody);
+
+                listLogs.forEach((log, index) => {
+                    const row = $('<tr></tr>');
+                    const dateCell = $('<td></td>').text(log.date_at);
+                    const statusCell = $('<td></td>').text(log.status);
+
+                    row.append(dateCell);
+                    row.append(statusCell);
+                    tbody.append(row);
+                });
+
+                container.append(table);
+            }
+        });
+    });
+
             function printErrorMsg(msg) {
                 $.each(msg, function(key, value) {
                     //console.log(key);
@@ -1124,12 +1202,14 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $('.status-item').click(function(event) {
+            $('body').on('click', '.status-item', function() {
+                // $('.status-item').click(function(event) {
                 event.preventDefault();
                 var customerId = $(this).data('id');
                 var currentStatus = $(this).data('status');
 
                 Swal.fire({
+                    position: 'top-center',
                     title: 'เปลี่ยนสถานะ',
                     input: 'select',
                     inputOptions: {
@@ -1176,7 +1256,6 @@
                                             timer: 2500
                                         });
 
-                                        //tableUser.draw();
                                         setTimeout(
                                             "location.href = '{{ route('customers') }}';",
                                             1500);

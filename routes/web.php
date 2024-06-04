@@ -64,5 +64,7 @@ Route::middleware(['isLogin'])->group(function () {
         Route::delete('/{id}', [CustomerController::class, 'destroy'])->name('customers.destroy');
         Route::delete('delete-image/{id}', [CustomerController::class, 'deleteImg'])->name('customers.delImg');
         Route::delete('delete-file/{id}', [CustomerController::class, 'deleteFile'])->name('customers.delFile');
+
+        Route::get('/logs-status/{id}', [CustomerController::class, 'logStatus'])->name('customers.logStatus');
     });
 });
