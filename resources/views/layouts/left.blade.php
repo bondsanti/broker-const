@@ -55,6 +55,30 @@
                         </p>
                     </a>
                 </li> --}}
+                @if ($isRole->role_type == 'Admin')
+                  <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }} {{ request()->routeIs('notify') ? 'menu-open' : '' }}">
+                      <a href="#" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }} {{ request()->routeIs('notify') ? 'active' : '' }}">
+                          <i class="nav-icon fas fa-cogs"></i>
+                          <p>
+                              ตั้งค่า
+                              <i class="fas fa-angle-left right"></i>
+                          </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+
+
+
+                       
+                          <li class="nav-item">
+                            <a href="{{route('notify')}}" class="nav-link {{ request()->routeIs('notify') ? 'active' : '' }}">
+                                <i class="fa fa-envelope-circle-check nav-icon"></i>
+                                <p>แจ้งเตือน</p>
+                            </a>
+                        </li>
+
+                      </ul>
+                  </li>
+                  @endif
                 @if ($isRole->role_type == 'SuperAdmin')
                   <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }} {{ request()->routeIs('notify') ? 'menu-open' : '' }}">
                       <a href="#" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }} {{ request()->routeIs('notify') ? 'active' : '' }}">
