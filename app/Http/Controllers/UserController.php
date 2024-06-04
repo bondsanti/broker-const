@@ -14,7 +14,9 @@ class UserController extends Controller
     public function index(Request $request)
     {
 
-        $dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+        // $dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $users = Role_user::with('user_ref:id,code,name_th,name_eng,position_id,active', 'user_ref.position_ref:id,name')->orderBy('id', 'desc')->get();
 
         // นับจำนวนผู้ใช้ทั้งหมด
@@ -29,6 +31,7 @@ class UserController extends Controller
         return view(
             'users.index',
             compact(
+                'isRole',
                 'dataLoginUser',
                 'users',
                 'countUserSPAdmin',

@@ -20,7 +20,7 @@
 
               </div>
               <div class="info">
-                  <a href="#" class="d-block">คุณ </a>
+                  <a href="#" class="d-block">คุณ {{$dataLoginUser->name_th}}</a>
               </div>
           </div>
 
@@ -55,7 +55,7 @@
                         </p>
                     </a>
                 </li> --}}
-                @if ($dataLoginUser->role_type == 'SuperAdmin')
+                @if ($isRole->role_type == 'SuperAdmin')
                   <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }} {{ request()->routeIs('notify') ? 'menu-open' : '' }}">
                       <a href="#" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }} {{ request()->routeIs('notify') ? 'active' : '' }}">
                           <i class="nav-icon fas fa-cogs"></i>

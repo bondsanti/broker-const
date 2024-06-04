@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Notify;
 use App\Models\Log;
 use App\Models\Role_user;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,11 +17,13 @@ class NotifyController extends Controller
 {
     public function index()
     {
-        $dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+        //$dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $Notify = Notify::orderBy('id', 'desc')->get();
         $Emails = DB::table('emails')->orderBy('id', 'desc')->get();
-        return view('notify.index', compact('dataLoginUser','Notify', 'Emails'));
+        return view('notify.index', compact('isRole','dataLoginUser','Notify', 'Emails'));
     }
 
     public function store(Request $request)

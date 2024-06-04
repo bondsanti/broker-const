@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Email;
 use App\Models\Role_user;
+use App\Models\User;
 use App\Notifications\OverSlaNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,8 +17,10 @@ class MainController extends Controller
 {
     public function index(Request $request)
     {
-        $dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
-
+        
+        //$dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $data = [];
         $overSlaCount = 0;
@@ -54,7 +57,7 @@ class MainController extends Controller
 
 
 
-        return view('main.index', compact('dataLoginUser','data', 'overSlaCount','countRenovate', 'countBstrature', 'countDesign'));
+        return view('main.index', compact('isRole','dataLoginUser','data', 'overSlaCount','countRenovate', 'countBstrature', 'countDesign'));
     }
 
 

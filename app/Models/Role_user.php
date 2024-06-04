@@ -11,6 +11,7 @@ class Role_user extends Model
     protected $connection = 'mysql';
     protected $table = 'role_user';
 
+
     public function user_ref()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

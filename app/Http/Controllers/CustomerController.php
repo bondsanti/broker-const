@@ -7,6 +7,7 @@ use App\Models\File;
 use App\Models\Image;
 use App\Models\Notify;
 use App\Models\Role_user;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +18,9 @@ class CustomerController extends Controller
 {
     public function index(Request $request)
     {
-        $dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+        //$dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $status = $request->input('status', []);
         $notify_ids = $request->input('notify_id', []);
@@ -78,7 +81,7 @@ class CustomerController extends Controller
 
         $Customers = $query->orderBy('id', 'desc')->get();
         //dd($Customers);
-        return view('customers.index', compact('dataLoginUser','Notify', 'Customers'));
+        return view('customers.index', compact('isRole','dataLoginUser','Notify', 'Customers'));
     }
 
     public function store(Request $request)
