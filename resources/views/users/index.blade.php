@@ -85,7 +85,7 @@
                                         <th>#</th>
                                         <th>รหัสพนักงาน</th>
                                         <th>ชื่อ-สกุล</th>
-                                        <th>ตำแหน่ง</th>
+                                        {{-- <th>ตำแหน่ง</th> --}}
                                         <th>ประเภทผู้ใช้งาน</th>
                                         <th class="text-center">Action</th>
                                     </tr>
@@ -96,8 +96,8 @@
                                             <tr>
                                                 <td width="5%">{{ $loop->index + 1 }}</td>
                                                 <td>{{ optional($user->user_ref)->code }}</td>
-                                                <td>{{ optional($user->user_ref)->name_th }}</td>
-                                                <td width="30%">{{ optional($user->user_ref->position_ref)->name }}</td>
+                                                <td>{{ optional($user->user_ref)->email }}</td>
+                                                {{-- <td width="30%">{{ optional($user->user_ref->position_ref)->name }}</td> --}}
 
                                                 <td>
 

@@ -20,7 +20,7 @@
 
               </div>
               <div class="info">
-                  <a href="#" class="d-block">คุณ {{$dataLoginUser->name_th}}</a>
+                  <a href="#" class="d-block">คุณ {{$dataLoginUser->email}}</a>
               </div>
           </div>
 
@@ -68,7 +68,7 @@
 
 
 
-                       
+
                           <li class="nav-item">
                             <a href="{{route('notify')}}" class="nav-link {{ request()->routeIs('notify') ? 'active' : '' }}">
                                 <i class="fa fa-envelope-circle-check nav-icon"></i>
