@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Email;
 use Session;
 use Illuminate\Support\Facades\DB;
@@ -62,16 +63,32 @@ class NotifyController extends Controller
 
     public function destroy($id)
     {
-        $Notify = Notify::where('id', $id)->first();
-        $Notify_old = $Notify->toArray();
+        $customer = Customer::find($id);
 
-        // Log::addLog($user_id,json_encode($roleUser_old), 'Delete RoleUser : '.$roleUser);
-        $Notify->delete($id);
+        if (!$customer) {
+            return response()->json([
+                'message' => 'ไม่พบข้อมูลลูกค้าที่ต้องการลบ',
+                'error' => true
+            ], 404);
+        }
+
+
+        $relatedNotifications = $customer->notify_ref()->exists();
+
+        if ($relatedNotifications) {
+            return response()->json([
+                'message' => 'ไม่สามารถลบข้อมูลได้ เนื่องจากพบข้อมูลที่ใช้ลักษณะงานนี้อยู่',
+                'error' => true
+            ], 400);
+        }
+
+        $customer->delete();
 
         return response()->json([
             'message' => 'ลบข้อมูลสำเร็จ'
         ], 201);
     }
+
 
 
     public function update(Request $request)

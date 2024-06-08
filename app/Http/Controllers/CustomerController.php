@@ -43,7 +43,7 @@ class CustomerController extends Controller
         $query = Customer::with('notify_ref:id,name,sla')->whereNull('deleted_at');
 
         if (!empty($name_customers_array)) {
-            $query->where(function($q) use ($name_customers_array) {
+            $query->where(function ($q) use ($name_customers_array) {
                 foreach ($name_customers_array as $name_customer) {
                     $q->orWhere('cus_name', 'like', '%' . $name_customer . '%');
                 }
@@ -52,7 +52,7 @@ class CustomerController extends Controller
 
         // ตรวจสอบและเพิ่มเงื่อนไขการค้นหาตามเบอร์โทรศัพท์หลายค่า
         if (!empty($phone_customers_array)) {
-            $query->where(function($q) use ($phone_customers_array) {
+            $query->where(function ($q) use ($phone_customers_array) {
                 foreach ($phone_customers_array as $phone_customer) {
                     $q->orWhere('tel', 'like', '%' . $phone_customer . '%');
                 }
@@ -83,13 +83,97 @@ class CustomerController extends Controller
 
         $Customers = $query->orderBy('id', 'desc')->get();
         //dd($Customers);
-        return view('customers.index', compact('isRole','dataLoginUser','Notify', 'Customers'));
+        return view('customers.index', compact('isRole', 'dataLoginUser', 'Notify', 'Customers'));
     }
 
+    // public function store(Request $request)
+    // {
+    //     //dd($request->all());
+
+    //     $validator = Validator::make($request->all(), [
+    //         'cus_name' => 'required',
+    //         'tel' => 'required',
+    //         'notify_id' => 'required',
+    //         'budget' => 'required',
+    //         'location' => 'required',
+    //     ], [
+    //         'cus_name.required' => 'กรุณากรอกชื่อลูกค้า',
+    //         'tel.required' => 'กรุณากรอกเบอร์โทรศัพท์',
+    //         'notify_id.required' => 'กรุณาเลือกลักษณะงาน',
+    //         'budget.required' => 'กรุณากรอกงบประมาณ',
+    //         'location.required' => 'กรุณากรอกสถานที่',
+
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json(['error' => $validator->errors()]);
+    //     }
+
+    //     $budget = str_replace(',', '', $request->budget);
+
+    //     // Generate cus_no
+    //     $lastCusNo = Customer::max('cus_no');
+    //     if ($lastCusNo) {
+    //         $lastCusNo = explode('-', $lastCusNo)[1] ?? null; // เอาเลขสุดท้าย
+    //         $nextCusNo = 'BCO-' . sprintf('%03d', intval($lastCusNo) + 1);
+    //     } else {
+    //         // กรณีไม่มีข้อมูลในฐานข้อมูล
+    //         $nextCusNo = 'BCO-001';
+    //     }
+
+    //     $Customers = new Customer();
+    //     $Customers->cus_no = $nextCusNo;
+    //     $Customers->cus_name = $request->cus_name;
+    //     $Customers->tel = $request->tel;
+    //     $Customers->status = "อยู่ระหว่างประสานงาน";
+    //     $Customers->notify_id = $request->notify_id;
+    //     $Customers->budget = $budget;
+    //     $Customers->location = $request->location;
+    //     $Customers->maps = $request->maps;
+    //     $Customers->detail = $request->detail;
+    //     $Customers->remark = $request->remark;
+    //     $Customers->save();
+    //     $Customers->refresh();
+
+    //     //dd($Customers->id);
+    //     //รูปภาพ
+    //     if ($request->hasFile('images')) {
+    //         foreach ($request->file('images') as $image) {
+    //             $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+    //             // Save the image to storage
+    //             // $image->storeAs('public/images', $filename);
+    //             Storage::putFileAs('public/images', $image, $filename);
+    //             Image::create([
+    //                 'cus_id' => $Customers->id,
+    //                 'url' => $filename,
+    //             ]);
+    //         }
+    //     } else {
+    //         // กรณีไม่มีไฟล์ที่อัปโหลด
+    //     }
+
+    //     //ไฟล์
+    //     if ($request->hasFile('files')) {
+    //         foreach ($request->file('files') as $file) {
+    //             $filename2 = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+    //             Storage::putFileAs('public/files', $file, $filename2);
+    //             File::create([
+    //                 'cus_id' => $Customers->id,
+    //                 'url' => $filename2,
+    //             ]);
+    //         }
+    //     } else {
+    //         // กรณีไม่มีไฟล์ที่อัปโหลด
+    //     }
+
+    //     // Log::addLog(Session::get('loginId'), 'Create User', $roleUser);
+
+    //     return response()->json(['message' => 'เพิ่มข้อมูลเรียบร้อยแล้ว'], 201);
+    // }
     public function store(Request $request)
     {
-        //dd($request->all());
-
+        // Validate the request
         $validator = Validator::make($request->all(), [
             'cus_name' => 'required',
             'tel' => 'required',
@@ -102,72 +186,51 @@ class CustomerController extends Controller
             'notify_id.required' => 'กรุณาเลือกลักษณะงาน',
             'budget.required' => 'กรุณากรอกงบประมาณ',
             'location.required' => 'กรุณากรอกสถานที่',
-
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
         }
 
+        // Format the budget
         $budget = str_replace(',', '', $request->budget);
 
         // Generate cus_no
         $lastCusNo = Customer::max('cus_no');
-        if ($lastCusNo) {
-            $lastCusNo = explode('-', $lastCusNo)[1] ?? null; // เอาเลขสุดท้าย
-            $nextCusNo = 'BCO-' . sprintf('%03d', intval($lastCusNo) + 1);
-        } else {
-            // กรณีไม่มีข้อมูลในฐานข้อมูล
-            $nextCusNo = 'BCO-001';
-        }
+        $nextCusNo = $lastCusNo ? 'BCO-' . sprintf('%03d', intval(explode('-', $lastCusNo)[1] ?? 0) + 1) : 'BCO-001';
 
-        $Customers = new Customer();
-        $Customers->cus_no = $nextCusNo;
-        $Customers->cus_name = $request->cus_name;
-        $Customers->tel = $request->tel;
-        $Customers->status = "อยู่ระหว่างประสานงาน";
-        $Customers->notify_id = $request->notify_id;
-        $Customers->budget = $budget;
-        $Customers->location = $request->location;
-        $Customers->maps = $request->maps;
-        $Customers->detail = $request->detail;
-        $Customers->remark = $request->remark;
-        $Customers->save();
-        $Customers->refresh();
-
-        //dd($Customers->id);
-        //รูปภาพ
+        $customer = Customer::create([
+            'cus_no' => $nextCusNo,
+            'cus_name' => $request->cus_name,
+            'tel' => $request->tel,
+            'status' => 'อยู่ระหว่างประสานงาน',
+            'notify_id' => $request->notify_id,
+            'budget' => $budget,
+            'location' => $request->location,
+            'maps' => $request->maps,
+            'detail' => $request->detail,
+            'remark' => $request->remark,
+        ]);
         if ($request->hasFile('images')) {
+            $imageData = [];
             foreach ($request->file('images') as $image) {
                 $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                // Save the image to storage
-                // $image->storeAs('public/images', $filename);
                 Storage::putFileAs('public/images', $image, $filename);
-                Image::create([
-                    'cus_id' => $Customers->id,
-                    'url' => $filename,
-                ]);
+                $imageData[] = ['cus_id' => $customer->id, 'url' => $filename];
             }
-        } else {
-            // กรณีไม่มีไฟล์ที่อัปโหลด
+            Image::insert($imageData);
         }
 
-        //ไฟล์
+
         if ($request->hasFile('files')) {
+            $fileData = [];
             foreach ($request->file('files') as $file) {
-                $filename2 = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-                Storage::putFileAs('public/files', $file, $filename2);
-                File::create([
-                    'cus_id' => $Customers->id,
-                    'url' => $filename2,
-                ]);
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                Storage::putFileAs('public/files', $file, $filename);
+                $fileData[] = ['cus_id' => $customer->id, 'url' => $filename];
             }
-        } else {
-            // กรณีไม่มีไฟล์ที่อัปโหลด
+            File::insert($fileData);
         }
-
-        // Log::addLog(Session::get('loginId'), 'Create User', $roleUser);
 
         return response()->json(['message' => 'เพิ่มข้อมูลเรียบร้อยแล้ว'], 201);
     }
@@ -181,7 +244,7 @@ class CustomerController extends Controller
     public function logStatus($id)
     {
 
-        $Customers = Log_status::where('cus_id',$id)->get();
+        $Customers = Log_status::where('cus_id', $id)->get();
 
         return response()->json($Customers, 200);
     }
@@ -257,7 +320,7 @@ class CustomerController extends Controller
         return response()->json(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว'], 200);
     }
 
-    public function updateStatus(Request $request,$id)
+    public function updateStatus(Request $request, $id)
     {
         $Log_status = new Log_status();
         $Log_status->user_id = Session::get('loginId');
@@ -272,7 +335,7 @@ class CustomerController extends Controller
             $Customers->status_date = Carbon::now()->startOfDay()->toDateString();
             $Customers->save();
 
-            Log::addLog(Session::get('loginId'),json_encode($Customers_old), 'Update Status : '.$Customers);
+            Log::addLog(Session::get('loginId'), json_encode($Customers_old), 'Update Status : ' . $Customers);
             return response()->json(['message' => 'อัปเดตสถานะเรียบร้อยแล้ว'], 200);
         }
     }
@@ -311,7 +374,7 @@ class CustomerController extends Controller
             $Images->delete();
         }
 
-        Log::addLog(Session::get('loginId'),json_encode($Customers_old), 'Delete Customer : '.$Customers);
+        Log::addLog(Session::get('loginId'), json_encode($Customers_old), 'Delete Customer : ' . $Customers);
 
         $Customers->delete($id);
 

@@ -17,7 +17,7 @@ class MainController extends Controller
 {
     public function index(Request $request)
     {
-        
+
         //$dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
         $dataLoginUser = User::where('id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
@@ -28,6 +28,7 @@ class MainController extends Controller
 
         $query = Customer::with('notify_ref:id,name,sla')
             ->whereNull('deleted_at')
+            ->where('status', '!=', 'เซ็นสัญญาแล้ว')
             ->orderBy('id', 'desc');
 
         $Customers = $query->get();
@@ -57,41 +58,81 @@ class MainController extends Controller
 
 
 
-        return view('main.index', compact('isRole','dataLoginUser','data', 'overSlaCount','countRenovate', 'countBstrature', 'countDesign'));
+        return view('main.index', compact('isRole', 'dataLoginUser', 'data', 'overSlaCount', 'countRenovate', 'countBstrature', 'countDesign'));
     }
 
 
+    // public function notifyEmail()
+    // {
+
+    //     $data = [];
+    //     $overSlaCount = 0;
+    //     $query = Customer::with('notify_ref:id,name,sla')
+    //         ->whereNull('deleted_at')
+    //         ->orderBy('id', 'desc');
+    //     $Customers = $query->get();
+
+    //     foreach ($Customers as $Customer) {
+    //         if ($Customer->notify_ref && $Customer->notify_ref->sla) {
+    //             $createdDate = Carbon::parse($Customer->created_at);
+    //             $currentDate = Carbon::now();
+    //             $daysDiff = $createdDate->diffInDays($currentDate);
+
+    //             if ($daysDiff >= $Customer->notify_ref->sla) {
+    //                 $data[] = [
+    //                     'customer' => $Customer,
+    //                     'dayDiff' => $daysDiff
+    //                 ];
+    //                 $overSlaCount++;
+
+    //                 // ส่งอีเมล
+    //                 $emails = Email::where('active', 1)->pluck('email');
+    //                 Notification::route('mail', $emails)->notify(new OverSlaNotification($Customer, $daysDiff));
+    //             }
+    //         }
+    //     }
+
+    //     return response()->json($data, 200);
+
+    // }
+
     public function notifyEmail()
     {
-
-        $data = [];
         $overSlaCount = 0;
+        $customersData = [];
+        $emails = [];
+
         $query = Customer::with('notify_ref:id,name,sla')
             ->whereNull('deleted_at')
+            ->where('status', '!=', 'เซ็นสัญญาแล้ว')
             ->orderBy('id', 'desc');
-        $Customers = $query->get();
 
-        foreach ($Customers as $Customer) {
-            if ($Customer->notify_ref && $Customer->notify_ref->sla) {
-                $createdDate = Carbon::parse($Customer->created_at);
+        $customers = $query->get();
+
+        foreach ($customers as $customer) {
+            if ($customer->notify_ref && $customer->notify_ref->sla) {
+                $createdDate = Carbon::parse($customer->created_at);
                 $currentDate = Carbon::now();
                 $daysDiff = $createdDate->diffInDays($currentDate);
 
-                if ($daysDiff >= $Customer->notify_ref->sla) {
-                    $data[] = [
-                        'customer' => $Customer,
-                        'dayDiff' => $daysDiff
-                    ];
+                if ($daysDiff >= $customer->notify_ref->sla) {
                     $overSlaCount++;
 
-                    // ส่งอีเมล
-                    $emails = Email::where('active', 1)->pluck('email');
-                    Notification::route('mail', $emails)->notify(new OverSlaNotification($Customer, $daysDiff));
+
+
+                    $customersData[] = [
+                        'customer' => $customer,
+                        'daysDiff' => $daysDiff
+                    ];
                 }
             }
         }
 
-        return response()->json($data, 200);
 
+        $emails = Email::where('active', 1)->pluck('email')->toArray();
+        Notification::route('mail', $emails)->notify(new OverSlaNotification($customersData, $overSlaCount));
+
+
+        return response()->json($customersData, 200);
     }
 }

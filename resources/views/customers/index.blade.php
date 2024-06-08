@@ -38,6 +38,12 @@
             .show-logs {
                 cursor: pointer;
             }
+
+            .image-preview {
+                position: relative;
+                display: inline-block;
+                margin: 10px;
+            }
         </style>
     @endpush
 
@@ -233,7 +239,8 @@
                                             <td>{{ optional($Customer->notify_ref)->name }}</td>
                                             <td>{{ $Customer->location }}</td>
                                             <td>{{ number_format($Customer->budget ?? 0) }}</td>
-                                            <td>{{ $Customer->created_at ? $Customer->created_at->format('Y-m-d') : '-' }}</td>
+                                            <td>{{ $Customer->created_at ? $Customer->created_at->format('Y-m-d') : '-' }}
+                                            </td>
                                             <td>{{ $Customer->created_at->diffInDays(now()) }} วัน</td>
                                             <td> <a data-id="{{ $Customer->id }}"
                                                     class="show-logs">{{ $Customer->status_date }}</a></td>
@@ -357,6 +364,7 @@
                                                             JPG, PNG</label>
                                                     </div>
 
+
                                                 </div>
 
                                                 <p class="text-danger mt-1">สามารถเลือกได้หลายรูป</p>
@@ -373,6 +381,8 @@
 
                                                 </div>
                                                 <p class="text-danger mt-1">สามารถเลือกได้หลายไฟล์</p>
+
+                                                <div id="progress-container"></div>
                                             </div>
 
                                         </div>
@@ -632,17 +642,21 @@
                                 <dd class="col-sm-8"><span id="cus_date_s"></span></dd>
                                 <dt class="col-sm-4">รายละเอียด</dt>
                                 <dd class="col-sm-8"><span id="detail_s"></span></dd>
+                                <dt class="col-sm-4">ไฟล์แนบ</dt>
+                                <dd class="col-sm-8">
+                                    <div class="row mailbox-attachment-info" id="file-container-show">
 
+                                </div></dd>
                             </dl>
 
-                            <div class="row col-12">
-
+                            <div class="row mt-3">
                                 <div class="col-12">
-                                    <img src="" class="product-image" alt="Product Image">
+                                    <img src="" class="img-fluid product-image" alt="Product Image">
                                 </div>
+                            </div>
+                            <div class="row mt-3">
+
                                 <div class="product-image-thumbs" id="image-container-show">
-
-
 
                                 </div>
                             </div>
@@ -697,6 +711,8 @@
 @endsection
 @push('script')
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const telInput = document.getElementById('tel');
@@ -747,7 +763,6 @@
                 $('#modal-create').modal('show');
             });
 
-            //savedata
             $('#savedata').click(function(e) {
                 e.preventDefault();
                 $(this).html('รอสักครู่..');
@@ -829,10 +844,26 @@
                             });
 
                             printErrorMsg(response.message);
+                        },
+                        413: function(xhr) {
+                            // const response = xhr.responseJSON;
+                            //console.log(response.error.code);
+                            $('#savedata').html('ลองอีกครั้ง');
+                            Swal.fire({
+                                position: 'top-center',
+                                icon: 'error',
+                                title: 'ไฟล์มีขนาดใหญ่เกิน',
+                                html: 'กรุณาลดจำนวนไฟล์หรือขนาดไฟล์ลง',
+                                showConfirmButton: true,
+                                timer: 2000
+                            });
+
+
                         }
                     }
                 });
             });
+
 
             //ShowDetail
             $('body').on('click', '.show-item', function() {
@@ -858,39 +889,63 @@
 
                     // $('#imgshow-1').attr('src', data.img_ref.url);
 
-                    var container = $('#image-container-show');
+                    const container = $('#image-container-show');
+                    const fscontainer = $('#file-container-show');
                     container.empty();
+                    fscontainer.empty();
 
-                    // Append image references
-                    var imgRefs = data.img_ref;
-                    imgRefs.forEach((img, index) => {
-                        const imgWrapper = $('<div>', {
-                            class: 'col-md-2',
-                            id: `img-wrapper-${index + 1}`
+                    const imgRefs = data.img_ref;
+                    const fileRefs = data.file_ref;
+
+                    for (var i = 0; i < imgRefs.length; i += 5) {
+                        var row = $('<div>', {
+                            class: 'row mt-3'
                         });
-                        const imgElement = $('<img>', {
-                            class: 'product-image-thumb mb-1',
-                            id: `imgshow-${index + 1}`,
-                            src: `{{ asset('storage/images') }}/${img.url}`,
-                            name: `imgshow-${index + 1}`
-                        });
+                        container.append(row);
 
-                        imgWrapper.append(imgElement);
-                        container.append(imgWrapper);
+                        for (var j = i; j < i + 5 && j < imgRefs.length; j++) {
+                            const imgWrapper = $('<div>', {
+                                class: 'col-md-2',
+                                id: `img-wrapper-${j + 1}`
+                            });
+                            const imgElement = $('<img>', {
+                                class: 'product-image-thumb mb-1',
+                                id: `imgshow-${j + 1}`,
+                                src: `{{ asset('storage/images') }}/${imgRefs[j].url}`,
+                                name: `imgshow-${j + 1}`
+                            });
 
-                        // Set the first image as active and display it as the main image
-                        if (index === 0) {
-                            imgElement.addClass('active');
-                            $('.product-image').prop('src', imgElement.attr('src'));
+                            imgWrapper.append(imgElement);
+                            row.append(imgWrapper);
+
+                            if (j === i) {
+                                imgElement.addClass('active');
+                                $('.product-image').prop('src', imgElement.attr('src'));
+                            }
+
+                            imgElement.on('click', function() {
+                                // When clicking on a small image
+                                $('.product-image').prop('src', $(this).attr('src'));
+                                $('.product-image-thumb.active').removeClass('active');
+                                $(this).addClass('active');
+                            });
                         }
+                    }
 
-                        imgElement.on('click', function() {
-                            $('.product-image').prop('src', $(this).attr('src'));
-                            $('.product-image-thumb.active').removeClass('active');
-                            $(this).addClass('active');
+                    fileRefs.forEach((file, index) => {
+                        const fileWrapper = $('<div>', {
+                            class: 'col-md-12',
+                            id: `file-wrapper-${index + 1}`
                         });
+                        const fileElement = $(`<a>`, {
+                            href: `{{ asset('storage/files') }}/${file.url}`,
+                            target: '_blank',
+                            class: 'mailbox-attachment-name',
+                            html: `<i class="far fa-file-pdf mb-1"></i> ${file.url}`
+                        });
+                        fileWrapper.append(fileElement);
+                        fscontainer.append(fileWrapper);
                     });
-
 
                 });
 
@@ -1152,39 +1207,39 @@
 
             //Showlog
             $('body').on('click', '.show-logs', function() {
-        const id = $(this).data('id');
-        $('#modal-logs').modal('show');
+                const id = $(this).data('id');
+                $('#modal-logs').modal('show');
 
-        $.get('customers/logs-status/' + id, function(data) {
-            const listLogs = data;
-            const container = $('#content-show');
-            container.empty();
+                $.get('customers/logs-status/' + id, function(data) {
+                    const listLogs = data;
+                    const container = $('#content-show');
+                    container.empty();
 
-            if (listLogs.length === 0) {
-                container.text('ไม่พบข้อมูล');
-            } else {
-                // Create the table structure
-                const table = $('<table class="table table-sm"></table>');
-                const thead = $('<thead><tr><th>วันที่</th><th>สถานะ</th></tr></thead>');
-                const tbody = $('<tbody></tbody>');
+                    if (listLogs.length === 0) {
+                        container.text('ไม่พบข้อมูล');
+                    } else {
+                        // Create the table structure
+                        const table = $('<table class="table table-sm"></table>');
+                        const thead = $('<thead><tr><th>วันที่</th><th>สถานะ</th></tr></thead>');
+                        const tbody = $('<tbody></tbody>');
 
-                table.append(thead);
-                table.append(tbody);
+                        table.append(thead);
+                        table.append(tbody);
 
-                listLogs.forEach((log, index) => {
-                    const row = $('<tr></tr>');
-                    const dateCell = $('<td></td>').text(log.date_at);
-                    const statusCell = $('<td></td>').text(log.status);
+                        listLogs.forEach((log, index) => {
+                            const row = $('<tr></tr>');
+                            const dateCell = $('<td></td>').text(log.date_at);
+                            const statusCell = $('<td></td>').text(log.status);
 
-                    row.append(dateCell);
-                    row.append(statusCell);
-                    tbody.append(row);
+                            row.append(dateCell);
+                            row.append(statusCell);
+                            tbody.append(row);
+                        });
+
+                        container.append(table);
+                    }
                 });
-
-                container.append(table);
-            }
-        });
-    });
+            });
 
             function printErrorMsg(msg) {
                 $.each(msg, function(key, value) {

@@ -428,12 +428,13 @@
                                     1500);
 
                             },
-                            statusCode: {
-                                400: function() {
+                            error: function(xhr, status, error) {
+                                if (xhr.status == 404) {
                                     Swal.fire({
                                         position: 'top-center',
                                         icon: 'error',
-                                        title: 'ไม่สามารถลบได้ ต้อง Disable เท่านั้น',
+                                        title: 'เกิดข้อผิดพลาด',
+                                        html :`ไม่สามารถลบข้อมูลได้ เนื่องจากพบข้อมูลที่อ้างอิงถึงข้อมูลที่ต้องการลบอยู่`,
                                         showConfirmButton: true,
                                         timer: 2500
                                     });

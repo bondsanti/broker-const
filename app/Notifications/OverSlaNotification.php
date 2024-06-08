@@ -10,17 +10,17 @@ use Illuminate\Notifications\Notification;
 class OverSlaNotification extends Notification
 {
     use Queueable;
-    protected $customer;
-    protected $dayDiff;
+    protected $customersData;
+    protected $overSlaCount;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($customer, $dayDiff)
+    public function __construct($customersData, $overSlaCount)
     {
-        $this->customer = $customer;
-        $this->dayDiff = $dayDiff;
+        $this->customersData = $customersData;
+        $this->overSlaCount = $overSlaCount;
     }
 
     /**
@@ -52,9 +52,9 @@ class OverSlaNotification extends Notification
         //             ->line('ผู้เกี่ยวข้องโปรดดำเนินการ');
         return (new MailMessage)
                     ->subject('Customer SLA Notification')
-                    ->view('notify.email', [
-                        'customer' => $this->customer,
-                        'daysDiff' => $this->dayDiff
+                    ->view('notify.email',  [
+                        'customersData' => $this->customersData,
+                        // 'overSlaCount' => $this->overSlaCount,
                     ]);
     }
 

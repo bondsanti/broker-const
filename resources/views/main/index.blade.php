@@ -208,17 +208,22 @@
                                 <dd class="col-sm-8"><span id="cus_date_s"></span></dd>
                                 <dt class="col-sm-4">รายละเอียด</dt>
                                 <dd class="col-sm-8"><span id="detail_s"></span></dd>
+                                <dt class="col-sm-4">ไฟล์แนบ</dt>
+                                <dd class="col-sm-8">
+                                    <div class="row mailbox-attachment-info" id="file-container-show">
+
+                                </div></dd>
 
                             </dl>
 
-                            <div class="row col-12">
-
+                            <div class="row mt-3">
                                 <div class="col-12">
-                                    <img src="" class="product-image" alt="Product Image">
+                                    <img src="" class="img-fluid product-image" alt="Product Image">
                                 </div>
+                            </div>
+                            <div class="row mt-3">
+
                                 <div class="product-image-thumbs" id="image-container-show">
-
-
 
                                 </div>
                             </div>
@@ -300,39 +305,63 @@
 
                 // $('#imgshow-1').attr('src', data.img_ref.url);
 
-                var container = $('#image-container-show');
-                container.empty();
+                const container = $('#image-container-show');
+                    const fscontainer = $('#file-container-show');
+                    container.empty();
+                    fscontainer.empty();
 
-                // Append image references
-                var imgRefs = data.img_ref;
-                imgRefs.forEach((img, index) => {
-                    const imgWrapper = $('<div>', {
-                        class: 'col-md-2',
-                        id: `img-wrapper-${index + 1}`
-                    });
-                    const imgElement = $('<img>', {
-                        class: 'product-image-thumb mb-1',
-                        id: `imgshow-${index + 1}`,
-                        src: `{{ asset('storage/images') }}/${img.url}`,
-                        name: `imgshow-${index + 1}`
-                    });
+                    const imgRefs = data.img_ref;
+                    const fileRefs = data.file_ref;
 
-                    imgWrapper.append(imgElement);
-                    container.append(imgWrapper);
+                    for (var i = 0; i < imgRefs.length; i += 5) {
+                        var row = $('<div>', {
+                            class: 'row mt-3'
+                        });
+                        container.append(row);
 
-                    // Set the first image as active and display it as the main image
-                    if (index === 0) {
-                        imgElement.addClass('active');
-                        $('.product-image').prop('src', imgElement.attr('src'));
+                        for (var j = i; j < i + 5 && j < imgRefs.length; j++) {
+                            const imgWrapper = $('<div>', {
+                                class: 'col-md-2',
+                                id: `img-wrapper-${j + 1}`
+                            });
+                            const imgElement = $('<img>', {
+                                class: 'product-image-thumb mb-1',
+                                id: `imgshow-${j + 1}`,
+                                src: `{{ asset('storage/images') }}/${imgRefs[j].url}`,
+                                name: `imgshow-${j + 1}`
+                            });
+
+                            imgWrapper.append(imgElement);
+                            row.append(imgWrapper);
+
+                            if (j === i) {
+                                imgElement.addClass('active');
+                                $('.product-image').prop('src', imgElement.attr('src'));
+                            }
+
+                            imgElement.on('click', function() {
+                                // When clicking on a small image
+                                $('.product-image').prop('src', $(this).attr('src'));
+                                $('.product-image-thumb.active').removeClass('active');
+                                $(this).addClass('active');
+                            });
+                        }
                     }
 
-                    imgElement.on('click', function() {
-                        $('.product-image').prop('src', $(this).attr('src'));
-                        $('.product-image-thumb.active').removeClass('active');
-                        $(this).addClass('active');
+                    fileRefs.forEach((file, index) => {
+                        const fileWrapper = $('<div>', {
+                            class: 'col-md-12',
+                            id: `file-wrapper-${index + 1}`
+                        });
+                        const fileElement = $(`<a>`, {
+                            href: `{{ asset('storage/files') }}/${file.url}`,
+                            target: '_blank',
+                            class: 'mailbox-attachment-name',
+                            html: `<i class="far fa-file-pdf mb-1"></i> ${file.url}`
+                        });
+                        fileWrapper.append(fileElement);
+                        fscontainer.append(fileWrapper);
                     });
-                });
-
 
             });
 

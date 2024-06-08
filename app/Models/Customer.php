@@ -11,6 +11,18 @@ class Customer extends Model
 
     protected $connection = 'mysql';
     protected $table = 'customers';
+    protected $fillable = [
+        'cus_no',
+        'cus_name',
+        'tel',
+        'status',
+        'notify_id',
+        'budget',
+        'location',
+        'maps',
+        'detail',
+        'remark',
+    ];
 
     public function notify_ref()
     {
