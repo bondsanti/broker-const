@@ -317,19 +317,19 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">ชื่อ-สกุล</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>ชื่อ-สกุล</label>
                                                 <input type="text" class="col-md-12 form-control" id="cus_name"
                                                     name="cus_name" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 cus_name_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">เบอร์โทรศัพท์</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>เบอร์โทรศัพท์</label>
                                                 <input type="text" class="col-md-12 form-control" id="tel"
                                                     name="tel" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 tel_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">เลือกลักษณะงาน</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>เลือกลักษณะงาน</label>
                                                 <select class="col-md-12 form-control" name="notify_id" id="notify_id">
                                                     <option value="">เลือก</option>
                                                     @foreach ($Notify as $Notifys)
@@ -341,14 +341,14 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">งบประมาณ</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>งบประมาณ</label>
                                                 <input type="text" class="col-md-12 form-control" id="budget"
                                                     name="budget" placeholder="" autocomplete="off"
                                                     onkeyup="this.value = Commas(this.value)">
                                                 <p class="text-danger mt-1 budget_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">สถานที่</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>สถานที่</label>
                                                 <input type="text" class="col-md-12 form-control" id="location"
                                                     name="location" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 location_err"></p>
@@ -469,19 +469,19 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">ชื่อ-สกุล</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>ชื่อ-สกุล</label>
                                                 <input type="text" class="col-md-12 form-control" id="cus_name_edit"
                                                     name="cus_name_edit" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 cus_name_edit_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">เบอร์โทรศัพท์</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>เบอร์โทรศัพท์</label>
                                                 <input type="text" class="col-md-12 form-control" id="tel_edit"
                                                     name="tel_edit" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 tel_edit_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">เลือกลักษณะงาน</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>เลือกลักษณะงาน</label>
                                                 <select class="col-md-12 form-control" name="notify_id_edit"
                                                     id="notify_id_edit">
                                                     <option value="">เลือก</option>
@@ -494,14 +494,14 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">งบประมาณ</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>งบประมาณ</label>
                                                 <input type="text" class="col-md-12 form-control" id="budget_edit"
                                                     name="budget_edit" placeholder="" autocomplete="off"
                                                     onkeyup="this.value = Commas(this.value)">
                                                 <p class="text-danger mt-1 budget_edit_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label">สถานที่</label>
+                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>สถานที่</label>
                                                 <input type="text" class="col-md-12 form-control" id="location_edit"
                                                     name="location_edit" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 location_edit_err"></p>
