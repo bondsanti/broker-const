@@ -7,6 +7,11 @@
                 position: relative;
                 display: inline-block;
             }
+            .products {
+                width: 100%;
+                height: 90px;
+                object-fit: cover;
+            }
 
             .btn-tool {
                 position: absolute;
@@ -36,6 +41,9 @@
             }
 
             .show-logs {
+                cursor: pointer;
+            }
+            .click-img {
                 cursor: pointer;
             }
 
@@ -646,18 +654,42 @@
                                 <dd class="col-sm-8">
                                     <div class="row mailbox-attachment-info" id="file-container-show">
 
-                                </div></dd>
+                                    </div>
+                                </dd>
                             </dl>
-
                             <div class="row mt-3">
-                                <div class="col-12">
-                                    <img src="" class="img-fluid product-image" alt="Product Image">
-                                </div>
+                                {{--
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        @for ($i = 0; $i < 20; $i++)
+                                            <div class="col-md-4">
+                                                <img class="img-fluid"
+                                                    src="https://cdn.pixabay.com/photo/2019/08/09/13/51/boat-4395122_1280.jpg"
+                                                    alt="Image {{ $i + 1 }}">
+
+                                            </div>
+                                        @endfor
+                                    </div>
+                                </div> --}}
+
                             </div>
                             <div class="row mt-3">
 
-                                <div class="product-image-thumbs" id="image-container-show">
+                                <img src="" class="img-fluid product-image" alt="Product Image">
 
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+
+                                    <div class="product-image-thumbs row" id="image-container-show">
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12 text-center">
+                                    <button id="prev-page" class="btn btn-primary">Previous</button>
+                                    <button id="next-page" class="btn btn-primary">Next</button>
                                 </div>
                             </div>
 
@@ -896,41 +928,63 @@
 
                     const imgRefs = data.img_ref;
                     const fileRefs = data.file_ref;
+                    const itemsPerPage = 9; // Number of items per page
+                    let currentPage = 1;
 
-                    for (var i = 0; i < imgRefs.length; i += 5) {
-                        var row = $('<div>', {
-                            class: 'row mt-3'
-                        });
-                        container.append(row);
+                    function renderImages(page) {
+                        container.empty();
 
-                        for (var j = i; j < i + 5 && j < imgRefs.length; j++) {
+                        const start = (page - 1) * itemsPerPage;
+                        const end = start + itemsPerPage;
+                        const paginatedItems = imgRefs.slice(start, end);
+
+                        paginatedItems.forEach((imgRef, index) => {
                             const imgWrapper = $('<div>', {
-                                class: 'col-md-2',
-                                id: `img-wrapper-${j + 1}`
+                                class: 'col-md-4',
+                                id: `img-wrapper-${start + index + 1}`
                             });
+
                             const imgElement = $('<img>', {
-                                class: 'product-image-thumb mb-1',
-                                id: `imgshow-${j + 1}`,
-                                src: `{{ asset('storage/images') }}/${imgRefs[j].url}`,
-                                name: `imgshow-${j + 1}`
+                                class: 'products click-img',
+                                id: `imgshow-${start + index + 1}`,
+                                src: `{{ asset('storage/images') }}/${imgRef.url}`,
+                                alt: `Image ${start + index + 1}`,
                             });
 
                             imgWrapper.append(imgElement);
-                            row.append(imgWrapper);
+                            container.append(imgWrapper);
 
-                            if (j === i) {
+                            if (start + index === 0) {
                                 imgElement.addClass('active');
                                 $('.product-image').prop('src', imgElement.attr('src'));
                             }
 
                             imgElement.on('click', function() {
-                                // When clicking on a small image
-                                $('.product-image').prop('src', $(this).attr('src'));
-                                $('.product-image-thumb.active').removeClass('active');
+                                $('.product-image').prop('src', $(this).attr(
+                                'src'));
+                                $('.product-image-thumb.active').removeClass(
+                                    'active');
                                 $(this).addClass('active');
                             });
-                        }
+                        });
                     }
+
+                    $('#prev-page').on('click', function() {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            renderImages(currentPage);
+                        }
+                    });
+
+                    $('#next-page').on('click', function() {
+                        if (currentPage < Math.ceil(imgRefs.length / itemsPerPage)) {
+                            currentPage++;
+                            renderImages(currentPage);
+                        }
+                    });
+
+                    // Initial render
+                    renderImages(currentPage);
 
                     fileRefs.forEach((file, index) => {
                         const fileWrapper = $('<div>', {
@@ -986,7 +1040,7 @@
                             id: `img-wrapper-${index + 1}`
                         });
                         const imgElement = $('<img>', {
-                            class: 'img-fluid mb-1',
+                            class: 'products',
                             id: `imgshow-${index + 1}`,
                             // src: 'images/'+img.url,
                             src: `{{ asset('storage/images') }}/${img.url}`,
