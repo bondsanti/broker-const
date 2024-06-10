@@ -1088,6 +1088,7 @@
                             id: `file-wrapper-${index + 1}`
                         });
                         const fileElement = $(`<a>`, {
+                            target: '_blank',
                             href: `{{ asset('storage/files') }}/${file.url}`,
                             class: 'mailbox-attachment-name',
                             html: `<i class="far fa-file-pdf mb-1"></i> ${file.url}`
