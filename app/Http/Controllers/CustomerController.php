@@ -207,6 +207,8 @@ class CustomerController extends Controller
             'notify_id' => $request->notify_id,
             'budget' => $budget,
             'location' => $request->location,
+            'cus_date' => $request->cus_date,
+            'onsite_date' => $request->onsite_date,
             'maps' => $request->maps,
             'detail' => $request->detail,
             'remark' => $request->remark,
