@@ -204,7 +204,7 @@ class CustomAuthController extends Controller
     {
 
         // $user = User::where('code', '=', $id)->orWhere('old_code', '=', $id)->first();
-        $user = User::where('id', '=', $id)->first();
+        $user = User::where('user_id', '=', $id)->first();
         //dd($user);
         if($user){
             $request->session()->put('loginId',$user->id);
