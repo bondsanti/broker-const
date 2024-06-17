@@ -21,7 +21,7 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         //$dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
-        $dataLoginUser = User::where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $status = $request->input('status', []);
