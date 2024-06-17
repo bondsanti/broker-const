@@ -207,7 +207,7 @@ class CustomAuthController extends Controller
         $user = User::where('user_id', '=', $id)->first();
         //dd($user);
         if($user){
-            $request->session()->put('loginId',$user->id);
+            $request->session()->put('loginId',$user->user_id);
             // Auth::login($user);
             // $user->last_login_at = date('Y-m-d H:i:s');
             // $user->save();
