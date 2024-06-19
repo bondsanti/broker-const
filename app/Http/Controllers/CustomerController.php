@@ -81,96 +81,12 @@ class CustomerController extends Controller
             }
         }
 
-        $Customers = $query->orderBy('id', 'desc')->get();
+        $Customers = $query->orderBy('cus_no', 'desc')->get();
         //dd($Customers);
         return view('customers.index', compact('isRole', 'dataLoginUser', 'Notify', 'Customers'));
     }
 
-    // public function store(Request $request)
-    // {
-    //     //dd($request->all());
 
-    //     $validator = Validator::make($request->all(), [
-    //         'cus_name' => 'required',
-    //         'tel' => 'required',
-    //         'notify_id' => 'required',
-    //         'budget' => 'required',
-    //         'location' => 'required',
-    //     ], [
-    //         'cus_name.required' => 'กรุณากรอกชื่อลูกค้า',
-    //         'tel.required' => 'กรุณากรอกเบอร์โทรศัพท์',
-    //         'notify_id.required' => 'กรุณาเลือกลักษณะงาน',
-    //         'budget.required' => 'กรุณากรอกงบประมาณ',
-    //         'location.required' => 'กรุณากรอกสถานที่',
-
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json(['error' => $validator->errors()]);
-    //     }
-
-    //     $budget = str_replace(',', '', $request->budget);
-
-    //     // Generate cus_no
-    //     $lastCusNo = Customer::max('cus_no');
-    //     if ($lastCusNo) {
-    //         $lastCusNo = explode('-', $lastCusNo)[1] ?? null; // เอาเลขสุดท้าย
-    //         $nextCusNo = 'BCO-' . sprintf('%03d', intval($lastCusNo) + 1);
-    //     } else {
-    //         // กรณีไม่มีข้อมูลในฐานข้อมูล
-    //         $nextCusNo = 'BCO-001';
-    //     }
-
-    //     $Customers = new Customer();
-    //     $Customers->cus_no = $nextCusNo;
-    //     $Customers->cus_name = $request->cus_name;
-    //     $Customers->tel = $request->tel;
-    //     $Customers->status = "อยู่ระหว่างประสานงาน";
-    //     $Customers->notify_id = $request->notify_id;
-    //     $Customers->budget = $budget;
-    //     $Customers->location = $request->location;
-    //     $Customers->maps = $request->maps;
-    //     $Customers->detail = $request->detail;
-    //     $Customers->remark = $request->remark;
-    //     $Customers->save();
-    //     $Customers->refresh();
-
-    //     //dd($Customers->id);
-    //     //รูปภาพ
-    //     if ($request->hasFile('images')) {
-    //         foreach ($request->file('images') as $image) {
-    //             $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-    //             // Save the image to storage
-    //             // $image->storeAs('public/images', $filename);
-    //             Storage::putFileAs('public/images', $image, $filename);
-    //             Image::create([
-    //                 'cus_id' => $Customers->id,
-    //                 'url' => $filename,
-    //             ]);
-    //         }
-    //     } else {
-    //         // กรณีไม่มีไฟล์ที่อัปโหลด
-    //     }
-
-    //     //ไฟล์
-    //     if ($request->hasFile('files')) {
-    //         foreach ($request->file('files') as $file) {
-    //             $filename2 = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-    //             Storage::putFileAs('public/files', $file, $filename2);
-    //             File::create([
-    //                 'cus_id' => $Customers->id,
-    //                 'url' => $filename2,
-    //             ]);
-    //         }
-    //     } else {
-    //         // กรณีไม่มีไฟล์ที่อัปโหลด
-    //     }
-
-    //     // Log::addLog(Session::get('loginId'), 'Create User', $roleUser);
-
-    //     return response()->json(['message' => 'เพิ่มข้อมูลเรียบร้อยแล้ว'], 201);
-    // }
     public function store(Request $request)
     {
         // Validate the request
@@ -196,8 +112,22 @@ class CustomerController extends Controller
         $budget = str_replace(',', '', $request->budget);
 
         // Generate cus_no
-        $lastCusNo = Customer::max('cus_no');
-        $nextCusNo = $lastCusNo ? 'BCO-' . sprintf('%03d', intval(explode('-', $lastCusNo)[1] ?? 0) + 1) : 'BCO-001';
+        // $lastCusNo = Customer::max('cus_no');
+        // $nextCusNo = $lastCusNo ? 'BCO-' . sprintf('%03d', intval(explode('-', $lastCusNo)[1] ?? 0) + 1) : 'BCO-001';
+
+
+        $allCusNos = Customer::orderBy('cus_no')->pluck('cus_no')->toArray();
+        $existingNumbers = array_map(function ($cusNo) {
+            return intval(explode('-', $cusNo)[1]);
+        }, $allCusNos);
+
+        $nextCusNo = null;
+        for ($i = 1; $i <= count($existingNumbers) + 1; $i++) {
+            if (!in_array($i, $existingNumbers)) {
+                $nextCusNo = 'BCO-' . sprintf('%03d', $i);
+                break;
+            }
+        }
 
         $customer = Customer::create([
             'cus_no' => $nextCusNo,
