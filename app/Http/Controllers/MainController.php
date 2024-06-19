@@ -20,7 +20,7 @@ class MainController extends Controller
 
         //$dataLoginUser = Role_user::where('user_id', Session::get('loginId'))->first();
         $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
-        //dd($dataLoginUser);
+        //dd(Session::get('loginId'));
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $data = [];

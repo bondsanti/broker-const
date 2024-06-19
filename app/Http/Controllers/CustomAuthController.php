@@ -16,7 +16,7 @@ class CustomAuthController extends Controller
 {
     public function login()
     {
-      //return view('auth.login');
+      return view('auth.login');
         //return redirect('http://vbnext.vbeyond.co.th/main');
         //return redirect('http://127.0.0.1:8000/main');
     }
@@ -38,7 +38,7 @@ class CustomAuthController extends Controller
         } else {
             if ($user_hr->active != 0) {
 
-                $role_user = Role_user::where('user_id', $user_hr->id)->orwhere('active',1)->first();
+                $role_user = Role_user::where('user_id', $user_hr->user_id)->orwhere('active',1)->first();
 
                 if (!$role_user) {
 
@@ -49,7 +49,7 @@ class CustomAuthController extends Controller
 
                     if (Hash::check($request->password, $user_hr->password)) {
 
-                        $request->session()->put('loginId', $user_hr->id);
+                        $request->session()->put('loginId', $user_hr->user_id);
 
                         DB::table('vbeyond_report.log_login')->insert([
                             'username' => $user_hr->code,
@@ -154,7 +154,7 @@ class CustomAuthController extends Controller
 
         if ($request->session()->has('loginId')) {
 
-            Log::addLog($request->session()->get('loginId'), '', 'Logout');
+            //Log::addLog($request->session()->get('loginId'), '', 'Logout');
 
             $request->session()->pull('loginId');
             Alert::success('ออกจากระบบเรียบร้อย', 'ไว้พบกันใหม่ :)');

@@ -212,7 +212,9 @@
                 <div class="col-12">
                     <div class="card card-lightblue">
                         <div class="card-header">
-                            <h3 class="card-title">ตารางข้อมูล</h3>
+                            <h3 class="card-title">ตารางข้อมูล  <button id="export-btn" class="btn btn-sm bg-gradient-warning"><i
+                                class="fa fa-file-excel"></i>
+                            Export Excel </button></h3>
 
                         </div>
 
@@ -231,6 +233,7 @@
                                         <th>งบประมาณ</th>
                                         <th>วันที่ เพิ่มข้อมูล</th>
                                         <th>ผ่านมาแล้ว</th>
+                                        <th>วันที่ แก้ไขข้อมูล</th>
                                         <th>วันที่ อัพเดทสถานะ</th>
                                         <th class="text-center">Action</th>
                                     </tr>
@@ -250,6 +253,8 @@
                                             <td>{{ $Customer->created_at ? $Customer->created_at->format('Y-m-d') : '-' }}
                                             </td>
                                             <td>{{ $Customer->created_at->diffInDays(now()) }} วัน</td>
+                                            <td>{{ $Customer->updated_at ? $Customer->updated_at->format('Y-m-d') : '-' }}
+                                            </td>
                                             <td> <a data-id="{{ $Customer->id }}"
                                                     class="show-logs">{{ $Customer->status_date }}</a></td>
                                             <td width="15%" class="text-center">
@@ -554,7 +559,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <label for="inputEmail3" class="col-form-label">
-                                                    วันที่นัดเข้าหน้างาน</label>
+                                                    วันที่ลูกค้าเข้า</label>
 
                                                 <input type="text" class="col-md-12 form-control datepicker"
                                                     id="cus_date_edit" name="cus_date_edit" placeholder=""
@@ -650,6 +655,8 @@
                                 <dd class="col-sm-8"><span id="cus_date_s"></span></dd>
                                 <dt class="col-sm-4">รายละเอียด</dt>
                                 <dd class="col-sm-8"><span id="detail_s"></span></dd>
+                                <dt class="col-sm-4">หมายเหตุ</dt>
+                                <dd class="col-sm-8"><span id="remark_s"></span></dd>
                                 <dt class="col-sm-4">ไฟล์แนบ</dt>
                                 <dd class="col-sm-8">
                                     <div class="row mailbox-attachment-info" id="file-container-show">
@@ -743,7 +750,7 @@
 @endsection
 @push('script')
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.8/xlsx.full.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -1400,4 +1407,26 @@
             });
         });
     </script>
+
+<script>
+    // Add event listener to the export button
+    document.getElementById('export-btn').addEventListener('click', exportTableToExcel);
+
+    // Function to export the HTML table to an Excel file
+    function exportTableToExcel() {
+        // Get the HTML table element
+        const table = document.getElementById('table');
+
+        // Convert the table to a worksheet
+        const worksheet = XLSX.utils.table_to_sheet(table);
+
+        const workbook = XLSX.utils.book_new();
+
+        // Add the worksheet to the workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+        // Export the workbook to an Excel file
+        XLSX.writeFile(workbook, 'data.xlsx');
+    }
+</script>
 @endpush
