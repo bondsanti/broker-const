@@ -47,7 +47,7 @@
                     </a>
                 </li>
 
-                @if ($isRole->role_type == 'Admin')
+                @if ($isRole->role_type == 'SuperAdmin' ||$isRole->role_type ==  'Staff')
                   <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }} {{ request()->routeIs('notify') ? 'menu-open' : '' }}">
                       <a href="#" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }} {{ request()->routeIs('notify') ? 'active' : '' }}">
                           <i class="nav-icon fas fa-cogs"></i>
@@ -71,8 +71,8 @@
                       </ul>
                   </li>
                   @endif
-                @if ($isRole->role_type == 'SuperAdmin')
-                  <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }} {{ request()->routeIs('notify') ? 'menu-open' : '' }}">
+                @if ($isRole->role_type == 'SuperAdmin' ||$isRole->role_type ==  'Staff')
+                  {{-- <li class="nav-item {{ request()->routeIs('users') ? 'menu-open' : '' }} {{ request()->routeIs('notify') ? 'menu-open' : '' }}">
                       <a href="#" class="nav-link {{ request()->routeIs('users') ? 'active' : '' }} {{ request()->routeIs('notify') ? 'active' : '' }}">
                           <i class="nav-icon fas fa-cogs"></i>
                           <p>
@@ -98,7 +98,7 @@
                         </li>
 
                       </ul>
-                  </li>
+                  </li> --}}
                   @endif
                   <li class="nav-item">
                     <a href="{{url('howto/คู่มือใช้งาน2024_v1.pdf')}}" target="_blank" class="nav-link">

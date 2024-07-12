@@ -7,6 +7,7 @@
                 position: relative;
                 display: inline-block;
             }
+
             .products {
                 width: 100%;
                 height: 90px;
@@ -43,6 +44,7 @@
             .show-logs {
                 cursor: pointer;
             }
+
             .click-img {
                 cursor: pointer;
             }
@@ -60,9 +62,11 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">ข้อมูลลูกค้า
+                        @if ($isRole->role_type == 'SuperAdmin' || $isRole->role_type == 'Staff')
                         <button type="button" class="btn bg-gradient-primary" id="Create">
                             <i class="fa fa-plus"></i> เพิ่มข้อมูล
                         </button>
+                        @endif
                     </h1>
 
                 </div><!-- /.col -->
@@ -212,9 +216,15 @@
                 <div class="col-12">
                     <div class="card card-lightblue">
                         <div class="card-header">
-                            <h3 class="card-title">ตารางข้อมูล  <button id="export-btn" class="btn btn-sm bg-gradient-warning"><i
-                                class="fa fa-file-excel"></i>
-                            Export Excel </button></h3>
+                            <h3 class="card-title">ตารางข้อมูล
+
+                                @if ($isRole->role_type == 'SuperAdmin' || $isRole->role_type == 'Staff')
+                                    <button id="export-btn" class="btn btn-sm bg-gradient-warning"><i
+                                            class="fa fa-file-excel"></i>
+                                        Export Excel </button>
+                                @endif
+
+                            </h3>
 
                         </div>
 
@@ -245,9 +255,22 @@
                                             <td>{{ $Customer->cus_no }}</td>
                                             <td>{{ $Customer->cus_date ? $Customer->cus_date : '-' }}</td>
                                             <td>{{ $Customer->onsite_date ? $Customer->onsite_date : '-' }}</td>
+                                            {{-- @if ($isRole->role_type == 'SuperAdmin' || $isRole->role_type == 'Admin' || $isRole->role_type == 'Staff') --}}
                                             <td>{{ $Customer->cus_name }}</td>
+                                            {{-- @else
+                                            @php
+                                                $name = $Customer->cus_name;
+                                                $firstName = $name ? explode(' ', $name)[0] : '-';
+                                             @endphp
+                                             <td>  {{ $firstName . ' .xxx' }}</td>
+                                            @endif --}}
+
+
                                             <td>{{ $Customer->status }}</td>
-                                            <td>{{ optional($Customer->notify_ref)->name }}</td>
+                                            <td>
+                                                {{ optional($Customer->notify_ref)->name }}
+
+                                            </td>
                                             <td>{{ $Customer->location }}</td>
                                             <td>{{ number_format($Customer->budget ?? 0) }}</td>
                                             <td>{{ $Customer->created_at ? $Customer->created_at->format('Y-m-d') : '-' }}
@@ -270,24 +293,27 @@
                                                     </i>
 
                                                 </a>
-                                                <button class="btn bg-gradient-primary btn-sm status-item" title="สถานะ"
-                                                    data-id="{{ $Customer->id }}" data-status="{{ $Customer->status }}">
-                                                    <i class="fa fa-refresh">
-                                                    </i>
+                                                @if ($isRole->role_type == 'SuperAdmin' || $isRole->role_type == 'Staff')
+                                                    <button class="btn bg-gradient-primary btn-sm status-item"
+                                                        title="สถานะ" data-id="{{ $Customer->id }}"
+                                                        data-status="{{ $Customer->status }}">
+                                                        <i class="fa fa-refresh">
+                                                        </i>
 
-                                                </button>
+                                                    </button>
 
-                                                <button class="btn bg-gradient-info btn-sm edit-item"
-                                                    data-id="{{ $Customer->id }}" title="แก้ไข">
-                                                    <i class="fa fa-pen-to-square">
-                                                    </i>
+                                                    <button class="btn bg-gradient-info btn-sm edit-item"
+                                                        data-id="{{ $Customer->id }}" title="แก้ไข">
+                                                        <i class="fa fa-pen-to-square">
+                                                        </i>
 
-                                                </button>
-                                                <button class="btn bg-gradient-danger btn-sm delete-item"
-                                                    data-id="{{ $Customer->id }}" title="ลบ">
-                                                    <i class="fa fa-trash">
-                                                    </i>
-                                                </button>
+                                                    </button>
+                                                    <button class="btn bg-gradient-danger btn-sm delete-item"
+                                                        data-id="{{ $Customer->id }}" title="ลบ">
+                                                        <i class="fa fa-trash">
+                                                        </i>
+                                                    </button>
+                                                @endif
 
                                             </td>
                                         </tr>
@@ -322,19 +348,25 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>ชื่อ-สกุล</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>ชื่อ-สกุล
+                                                </label>
                                                 <input type="text" class="col-md-12 form-control" id="cus_name"
                                                     name="cus_name" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 cus_name_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>เบอร์โทรศัพท์</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>เบอร์โทรศัพท์
+                                                </label>
                                                 <input type="text" class="col-md-12 form-control" id="tel"
                                                     name="tel" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 tel_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>เลือกลักษณะงาน</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>เลือกลักษณะงาน
+                                                </label>
                                                 <select class="col-md-12 form-control" name="notify_id" id="notify_id">
                                                     <option value="">เลือก</option>
                                                     @foreach ($Notify as $Notifys)
@@ -346,14 +378,18 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>งบประมาณ</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>งบประมาณ
+                                                </label>
                                                 <input type="text" class="col-md-12 form-control" id="budget"
                                                     name="budget" placeholder="" autocomplete="off"
                                                     onkeyup="this.value = Commas(this.value)">
                                                 <p class="text-danger mt-1 budget_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>สถานที่</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>สถานที่
+                                                </label>
                                                 <input type="text" class="col-md-12 form-control" id="location"
                                                     name="location" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 location_err"></p>
@@ -474,19 +510,25 @@
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>ชื่อ-สกุล</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>ชื่อ-สกุล
+                                                </label>
                                                 <input type="text" class="col-md-12 form-control" id="cus_name_edit"
                                                     name="cus_name_edit" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 cus_name_edit_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>เบอร์โทรศัพท์</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>เบอร์โทรศัพท์
+                                                </label>
                                                 <input type="text" class="col-md-12 form-control" id="tel_edit"
                                                     name="tel_edit" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 tel_edit_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>เลือกลักษณะงาน</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>เลือกลักษณะงาน
+                                                </label>
                                                 <select class="col-md-12 form-control" name="notify_id_edit"
                                                     id="notify_id_edit">
                                                     <option value="">เลือก</option>
@@ -499,14 +541,18 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>งบประมาณ</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>งบประมาณ
+                                                </label>
                                                 <input type="text" class="col-md-12 form-control" id="budget_edit"
                                                     name="budget_edit" placeholder="" autocomplete="off"
                                                     onkeyup="this.value = Commas(this.value)">
                                                 <p class="text-danger mt-1 budget_edit_err"></p>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="inputEmail3" class="col-form-label"><font color="red">* </font>สถานที่</label>
+                                                <label for="inputEmail3" class="col-form-label">
+                                                    <font color="red">* </font>สถานที่
+                                                </label>
                                                 <input type="text" class="col-md-12 form-control" id="location_edit"
                                                     name="location_edit" placeholder="" autocomplete="off">
                                                 <p class="text-danger mt-1 location_edit_err"></p>
@@ -968,7 +1014,7 @@
 
                             imgElement.on('click', function() {
                                 $('.product-image').prop('src', $(this).attr(
-                                'src'));
+                                    'src'));
                                 $('.product-image-thumb.active').removeClass(
                                     'active');
                                 $(this).addClass('active');
@@ -1408,25 +1454,25 @@
         });
     </script>
 
-<script>
-    // Add event listener to the export button
-    document.getElementById('export-btn').addEventListener('click', exportTableToExcel);
+    <script>
+        // Add event listener to the export button
+        document.getElementById('export-btn').addEventListener('click', exportTableToExcel);
 
-    // Function to export the HTML table to an Excel file
-    function exportTableToExcel() {
-        // Get the HTML table element
-        const table = document.getElementById('table');
+        // Function to export the HTML table to an Excel file
+        function exportTableToExcel() {
+            // Get the HTML table element
+            const table = document.getElementById('table');
 
-        // Convert the table to a worksheet
-        const worksheet = XLSX.utils.table_to_sheet(table);
+            // Convert the table to a worksheet
+            const worksheet = XLSX.utils.table_to_sheet(table);
 
-        const workbook = XLSX.utils.book_new();
+            const workbook = XLSX.utils.book_new();
 
-        // Add the worksheet to the workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
-        // Export the workbook to an Excel file
-        XLSX.writeFile(workbook, 'data.xlsx');
-    }
-</script>
+            // Export the workbook to an Excel file
+            XLSX.writeFile(workbook, 'data.xlsx');
+        }
+    </script>
 @endpush
