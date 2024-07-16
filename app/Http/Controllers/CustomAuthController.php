@@ -17,8 +17,8 @@ class CustomAuthController extends Controller
     public function login()
     {
       //return view('auth.login');
-      //return redirect('https://vbnext.vbeyond.co.th/main');
-      return redirect('http://127.0.0.1:8000/main');
+      return redirect('https://vbnext.vbeyond.co.th/main');
+      //return redirect('http://127.0.0.1:8000/main');
     }
     public function loginUser(Request $request)
     {
@@ -55,7 +55,7 @@ class CustomAuthController extends Controller
                             'username' => $user_hr->code,
                             'dates' => date('Y-m-d'),
                             'timeStm' => date('Y-m-d H:i:s'),
-                            'page' => 'BrokerCons'
+                            'page' => 'brokercons'
                         ]);
 
                         Log::addLog($request->session()->get('loginId'), 'Login', 'Login');
@@ -218,7 +218,7 @@ class CustomAuthController extends Controller
                         'username' => $user->code,
                         'dates' => date('Y-m-d'),
                         'timeStm' => date('Y-m-d H:i:s'),
-                        'page' => 'BrokerCons'
+                        'page' => 'brokercons'
                     ]);
 
                     Log::addLog($request->session()->get('loginId'), '', 'Login AllowLoginConnect By vBisConnect');
@@ -285,7 +285,7 @@ class CustomAuthController extends Controller
                 'username' => $user->code,
                 'dates' => date('Y-m-d'),
                 'timeStm' => date('Y-m-d H:i:s'),
-                'page' => 'Stock'
+                'page' => 'brokercons'
             ]);
 
             Log::addLog($request->session()->get('loginId'), '', 'Login');
