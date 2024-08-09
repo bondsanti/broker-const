@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('ZQRinxUWLPeWVFFRAdJa88xxWg6aArX002mt6WqqEa1nG3jvZYfxi5CbYhQjdGewepRav8y7q5Z4K7Mh/{id}&{token}',[CustomAuthController::class,'AllowLoginConnect']);
-
+Route::get('/sendEmail', [MainController::class, 'notifyEmail'])->name('sendEmail');
 
 Route::middleware(['alreadyLogin'])->group(function () {
 
@@ -30,7 +30,6 @@ Route::middleware(['alreadyLogin'])->group(function () {
 Route::middleware(['isLogin'])->group(function () {
 
     Route::get('/', [MainController::class, 'index'])->name('main');
-    Route::get('/sendEmail', [MainController::class, 'notifyEmail'])->name('sendEmail');
     Route::get('/logout/auth',[CustomAuthController::class,'logoutUser'])->name('logoutUser');
 
     Route::prefix('/users')->group(function () {

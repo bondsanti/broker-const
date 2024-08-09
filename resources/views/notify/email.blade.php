@@ -13,8 +13,8 @@
 
         .email-container {
             max-width: 600px;
-            margin: 30px auto;
-            padding: 20px;
+            margin: 15px auto;
+            padding: 10px;
             background: #fff;
         }
 
@@ -22,7 +22,7 @@
 
         .button {
             background-color: #5558AF;
-            /* Dark blue color */
+
             color: #ffffff;
             padding: 10px 20px;
             text-decoration: none;
@@ -33,12 +33,9 @@
 
         .button:hover {
             background-color: #40447a;
-            /* A slightly darker blue */
+
         }
 
-
-
-     /* เริ่มต้นการสร้างตาราง */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -48,38 +45,36 @@ table {
 th, td {
   padding: 10px;
   text-align: left;
-  border-bottom: 1px solid #ddd; /* เส้นขอบล่าง */
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
 }
 
 th {
-  background-color: #f2f2f2; /* สีพื้นหลังสำหรับหัวข้อคอลัมน์ */
-  color: #555; /* สีข้อความของหัวข้อคอลัมน์ */
+  background-color: #f2f2f2;
+  color: #555;
 }
 
 tr:hover {
-  background-color: #f5f5f5; /* สีพื้นหลังเมื่อนำเม้าส์ไปวางบนแถว */
+  background-color: #f5f5f5;
 }
-/* สิ้นสุดการสร้างตาราง */
 
-/* สไตล์สำหรับ header ของเอกสาร */
 .header {
-  background-color: #5558AF; /* สีพื้นหลังสำหรับ header */
-  color: #fff; /* สีข้อความของ header */
-  padding: 10px;
+  background-color: #5558AF;
+  color: #fff;
+  padding: 5px;
   text-align: center;
   font-size: 24px;
 }
 
-/* สไตล์สำหรับ content ของเอกสาร */
+
 .content {
-  padding: 20px;
+  padding: 5px;
   text-align: left;
 }
 
-/* สไตล์สำหรับ footer ของเอกสาร */
 .footer {
-  background-color: #f55d5d; /* สีพื้นหลังสำหรับ footer */
-  color: #fff; /* สีข้อความของ footer */
+  background-color: #f55d5d;
+  color: #fff;
   padding: 10px;
   text-align: center;
 }
